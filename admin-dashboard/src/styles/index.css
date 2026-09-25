@@ -22,6 +22,15 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 
+/* Dark mode theme support */
+[data-theme="dark"] {
+  --bg-primary: #090d16;
+  --bg-secondary: #131b2e;
+  --bg-card: #172036;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+}
+
 
 
 * {
