@@ -22,6 +22,8 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 
+
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -41,9 +43,10 @@ a {
   text-decoration: none;
 }
 
+
 button {
   font-family: inherit;
   cursor: pointer;
-  border: none;
+  border: red;
   outline: none;
 }

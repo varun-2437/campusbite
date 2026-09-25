@@ -6,6 +6,8 @@ Designed & developed by **M Varun** as part of the CampusBite SWE project.
 
 Based on the [CampusBite Implementation Plan](../CampusBite_Full_Implementation_Plan.md#m-varun---staffadmin-web-dashboard-react):
 
+
+
 1. **Authentication & Role-Based Routing**
    - Single unified login screen with automatic redirect based on user role (`Cashier`, `Kitchen`, `Counter`, `Manager`).
    - Protected routes & route guards.
