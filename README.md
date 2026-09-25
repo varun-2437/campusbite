@@ -1,4 +1,4 @@
-# CampusBite 🍔
+# CampusBite - Advanced Canteen Management Platform
 
 CampusBite is a smart campus food ordering and canteen management system designed to streamline cafeteria operations, reduce queue wait times, and provide seamless order tracking for students and staff.
 
