@@ -4,9 +4,11 @@ CampusBite is a smart campus food ordering and canteen management system designe
 
 ## 🚀 Key Features
 
+
 - **Student & Guest Ordering**: Browse real-time menus, customize orders, and checkout seamlessly.
 - **Order Tracking & Digital Tokens**: Receive dynamic QR/token updates from order placement to pickup.
 - **Role-Based Portals**:
+- 
   - **Students / Guests**: Menu browsing, cart, order history, and digital token pickup.
   - **Cashier**: Cash payment verification and token validation.
   - **Kitchen Staff**: Real-time kitchen display system (KDS) and status updates.
