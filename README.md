@@ -27,3 +27,6 @@ For the detailed team breakdown and feature-level implementation specifications,
 ## 📄 License
 
 This project is developed for educational purposes under course 23CCE302 - Software Engineering.
+
+making small changes
+
