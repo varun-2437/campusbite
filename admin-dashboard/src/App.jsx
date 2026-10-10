@@ -12,6 +12,7 @@ import CartCheckout from './pages/student/CartCheckout';
 import OrderTracking from './pages/student/OrderTracking';
 import OrderHistory from './pages/student/OrderHistory';
 import LoyaltyRewards from './pages/student/LoyaltyRewards';
+import StudentApp from './pages/student/StudentApp';
 
 // Staff & Admin Pages
 import Login from './pages/auth/Login';
@@ -44,6 +45,10 @@ export default function App() {
 
             {/* Public Staff Auth Route */}
             <Route path="/login" element={<Login />} />
+
+            {/* Direct Mobile Phone Simulator View */}
+            <Route path="/app" element={<StudentApp />} />
+            <Route path="/mobile" element={<Navigate to="/app" replace />} />
 
             {/* Public TV Mode for Canteen Counter */}
             <Route path="/now-serving" element={<NowServingBoard />} />
