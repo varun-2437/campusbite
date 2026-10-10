@@ -1,45 +1,297 @@
 export const initialMenuItems = [
   // --- TODAY'S SPECIAL ---
-  { itemId: 'sp1', name: 'Chef Special Hyderabadi Dum Biryani', category: 'Today Special', price: 160, isAvailable: true, prepTime: 12, isVeg: false },
-  { itemId: 'sp2', name: 'Paneer Tikka Stuffed Kulcha', category: 'Today Special', price: 110, isAvailable: true, prepTime: 10, isVeg: true },
-  { itemId: 'sp3', name: 'Crispy Dragon Chicken Wings', category: 'Today Special', price: 140, isAvailable: true, prepTime: 12, isVeg: false },
+  {
+    itemId: 'sp1',
+    name: 'Chef Special Hyderabadi Dum Biryani',
+    category: 'Today Special',
+    price: 160,
+    isAvailable: true,
+    prepTime: 12,
+    isVeg: false,
+    imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'sp2',
+    name: 'Paneer Tikka Stuffed Kulcha',
+    category: 'Today Special',
+    price: 110,
+    isAvailable: true,
+    prepTime: 10,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'sp3',
+    name: 'Crispy Dragon Chicken Wings',
+    category: 'Today Special',
+    price: 140,
+    isAvailable: true,
+    prepTime: 12,
+    isVeg: false,
+    imageUrl: 'https://images.unsplash.com/photo-1527477378392-1c0dc635c0fa?w=500&auto=format&fit=crop&q=80'
+  },
 
   // --- MAIN COURSE ---
-  { itemId: 'mc1', name: 'Veg Schezwan Fried Rice', category: 'Main Course', price: 95, isAvailable: true, prepTime: 10, isVeg: true },
-  { itemId: 'mc2', name: 'Egg Hakka Noodles', category: 'Main Course', price: 85, isAvailable: true, prepTime: 8, isVeg: false },
-  { itemId: 'mc3', name: 'Chicken Fried Rice with Chilli Garlic', category: 'Main Course', price: 120, isAvailable: true, prepTime: 12, isVeg: false },
-  { itemId: 'mc4', name: 'South Indian Mini Meals (Rice + Sambar + Curd)', category: 'Main Course', price: 75, isAvailable: true, prepTime: 5, isVeg: true },
-  { itemId: 'mc5', name: 'Butter Naan Basket (2 Pcs)', category: 'Main Course', price: 40, isAvailable: true, prepTime: 6, isVeg: true },
+  {
+    itemId: 'mc1',
+    name: 'Veg Schezwan Fried Rice',
+    category: 'Main Course',
+    price: 95,
+    isAvailable: true,
+    prepTime: 10,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'mc2',
+    name: 'Egg Hakka Noodles',
+    category: 'Main Course',
+    price: 85,
+    isAvailable: true,
+    prepTime: 8,
+    isVeg: false,
+    imageUrl: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'mc3',
+    name: 'Chicken Fried Rice with Chilli Garlic',
+    category: 'Main Course',
+    price: 120,
+    isAvailable: true,
+    prepTime: 12,
+    isVeg: false,
+    imageUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'mc4',
+    name: 'South Indian Mini Meals (Rice + Sambar + Curd)',
+    category: 'Main Course',
+    price: 75,
+    isAvailable: true,
+    prepTime: 5,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'mc5',
+    name: 'Butter Naan Basket (2 Pcs)',
+    category: 'Main Course',
+    price: 40,
+    isAvailable: true,
+    prepTime: 6,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=500&auto=format&fit=crop&q=80'
+  },
 
   // --- CURRIES ---
-  { itemId: 'cr1', name: 'Paneer Butter Masala', category: 'Curries', price: 110, isAvailable: true, prepTime: 10, isVeg: true },
-  { itemId: 'cr2', name: 'Chicken Chettinad Curry', category: 'Curries', price: 135, isAvailable: true, prepTime: 12, isVeg: false },
-  { itemId: 'cr3', name: 'Dal Tadka Special', category: 'Curries', price: 70, isAvailable: true, prepTime: 6, isVeg: true },
-  { itemId: 'cr4', name: 'Kadai Mushroom Gravy', category: 'Curries', price: 95, isAvailable: true, prepTime: 8, isVeg: true },
+  {
+    itemId: 'cr1',
+    name: 'Paneer Butter Masala',
+    category: 'Curries',
+    price: 110,
+    isAvailable: true,
+    prepTime: 10,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'cr2',
+    name: 'Chicken Chettinad Curry',
+    category: 'Curries',
+    price: 135,
+    isAvailable: true,
+    prepTime: 12,
+    isVeg: false,
+    imageUrl: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'cr3',
+    name: 'Dal Tadka Special',
+    category: 'Curries',
+    price: 70,
+    isAvailable: true,
+    prepTime: 6,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'cr4',
+    name: 'Kadai Mushroom Gravy',
+    category: 'Curries',
+    price: 95,
+    isAvailable: true,
+    prepTime: 8,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80'
+  },
 
   // --- HOT DRINKS ---
-  { itemId: 'hd1', name: 'South Indian Filter Coffee', category: 'Hot Drinks', price: 25, isAvailable: true, prepTime: 3, isVeg: true },
-  { itemId: 'hd2', name: 'Masala Chai (Ginger & Cardamom)', category: 'Hot Drinks', price: 20, isAvailable: true, prepTime: 3, isVeg: true },
-  { itemId: 'hd3', name: 'Hot Belgian Chocolate Drink', category: 'Hot Drinks', price: 55, isAvailable: true, prepTime: 4, isVeg: true },
-  { itemId: 'hd4', name: 'Green Tea (Honey Lemon)', category: 'Hot Drinks', price: 25, isAvailable: true, prepTime: 2, isVeg: true },
+  {
+    itemId: 'hd1',
+    name: 'South Indian Filter Coffee',
+    category: 'Hot Drinks',
+    price: 25,
+    isAvailable: true,
+    prepTime: 3,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'hd2',
+    name: 'Masala Chai (Ginger & Cardamom)',
+    category: 'Hot Drinks',
+    price: 20,
+    isAvailable: true,
+    prepTime: 3,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'hd3',
+    name: 'Hot Belgian Chocolate Drink',
+    category: 'Hot Drinks',
+    price: 55,
+    isAvailable: true,
+    prepTime: 4,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'hd4',
+    name: 'Green Tea (Honey Lemon)',
+    category: 'Hot Drinks',
+    price: 25,
+    isAvailable: true,
+    prepTime: 2,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?w=500&auto=format&fit=crop&q=80'
+  },
 
   // --- CHOCOLATES ---
-  { itemId: 'ch1', name: 'Ferrero Rocher Deluxe Cone', category: 'Chocolates', price: 65, isAvailable: true, prepTime: 1, isVeg: true },
-  { itemId: 'ch2', name: 'Cadbury Dairy Milk Silk (Roast Almond)', category: 'Chocolates', price: 80, isAvailable: true, prepTime: 1, isVeg: true },
-  { itemId: 'ch3', name: 'KitKat 4-Finger Dark Chocolate', category: 'Chocolates', price: 40, isAvailable: true, prepTime: 1, isVeg: true },
-  { itemId: 'ch4', name: 'Homemade Dark Chocolate Truffle', category: 'Chocolates', price: 50, isAvailable: true, prepTime: 2, isVeg: true },
+  {
+    itemId: 'ch1',
+    name: 'Ferrero Rocher Deluxe Cone',
+    category: 'Chocolates',
+    price: 65,
+    isAvailable: true,
+    prepTime: 1,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ch2',
+    name: 'Cadbury Dairy Milk Silk (Roast Almond)',
+    category: 'Chocolates',
+    price: 80,
+    isAvailable: true,
+    prepTime: 1,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ch3',
+    name: 'KitKat 4-Finger Dark Chocolate',
+    category: 'Chocolates',
+    price: 40,
+    isAvailable: true,
+    prepTime: 1,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1582293041079-7814c2f12063?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ch4',
+    name: 'Homemade Dark Chocolate Truffle',
+    category: 'Chocolates',
+    price: 50,
+    isAvailable: true,
+    prepTime: 2,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1548907040-4baa42d10919?w=500&auto=format&fit=crop&q=80'
+  },
 
   // --- ICE CREAMS ---
-  { itemId: 'ic1', name: 'Choco Nut Sundae with Hot Fudge', category: 'Ice Creams', price: 75, isAvailable: true, prepTime: 4, isVeg: true },
-  { itemId: 'ic2', name: 'Spanish Delight Double Scoop', category: 'Ice Creams', price: 60, isAvailable: true, prepTime: 3, isVeg: true },
-  { itemId: 'ic3', name: 'Classic Vanilla with Chocolate Dip', category: 'Ice Creams', price: 35, isAvailable: true, prepTime: 2, isVeg: true },
-  { itemId: 'ic4', name: 'Alphonso Mango Kulfi Stick', category: 'Ice Creams', price: 40, isAvailable: true, prepTime: 2, isVeg: true },
+  {
+    itemId: 'ic1',
+    name: 'Choco Nut Sundae with Hot Fudge',
+    category: 'Ice Creams',
+    price: 75,
+    isAvailable: true,
+    prepTime: 4,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ic2',
+    name: 'Spanish Delight Double Scoop',
+    category: 'Ice Creams',
+    price: 60,
+    isAvailable: true,
+    prepTime: 3,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ic3',
+    name: 'Classic Vanilla with Chocolate Dip',
+    category: 'Ice Creams',
+    price: 35,
+    isAvailable: true,
+    prepTime: 2,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ic4',
+    name: 'Alphonso Mango Kulfi Stick',
+    category: 'Ice Creams',
+    price: 40,
+    isAvailable: true,
+    prepTime: 2,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=500&auto=format&fit=crop&q=80'
+  },
 
   // --- DESSERTS ---
-  { itemId: 'ds1', name: 'Hot Sizzling Brownie with Vanilla Ice Cream', category: 'Desserts', price: 95, isAvailable: true, prepTime: 5, isVeg: true },
-  { itemId: 'ds2', name: 'Gulab Jamun with Rabdi (2 Pcs)', category: 'Desserts', price: 50, isAvailable: true, prepTime: 3, isVeg: true },
-  { itemId: 'ds3', name: 'Red Velvet Pastry Slice', category: 'Desserts', price: 65, isAvailable: true, prepTime: 2, isVeg: true },
-  { itemId: 'ds4', name: 'Lotus Biscoff Cheesecake Jar', category: 'Desserts', price: 110, isAvailable: true, prepTime: 3, isVeg: true }
+  {
+    itemId: 'ds1',
+    name: 'Hot Sizzling Brownie with Vanilla Ice Cream',
+    category: 'Desserts',
+    price: 95,
+    isAvailable: true,
+    prepTime: 5,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ds2',
+    name: 'Gulab Jamun with Rabdi (2 Pcs)',
+    category: 'Desserts',
+    price: 50,
+    isAvailable: true,
+    prepTime: 3,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ds3',
+    name: 'Red Velvet Pastry Slice',
+    category: 'Desserts',
+    price: 65,
+    isAvailable: true,
+    prepTime: 2,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1586788680434-30d324b2d46f?w=500&auto=format&fit=crop&q=80'
+  },
+  {
+    itemId: 'ds4',
+    name: 'Lotus Biscoff Cheesecake Jar',
+    category: 'Desserts',
+    price: 110,
+    isAvailable: true,
+    prepTime: 3,
+    isVeg: true,
+    imageUrl: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500&auto=format&fit=crop&q=80'
+  }
 ];
 
 export const initialOrders = [

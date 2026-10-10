@@ -212,6 +212,19 @@ export default function CashierDashboard() {
                     cursor: item.isAvailable ? 'pointer' : 'not-allowed'
                   }}
                 >
+                  {item.imageUrl && (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      style={{
+                        width: '100%',
+                        height: '110px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        marginBottom: '0.6rem'
+                      }}
+                    />
+                  )}
                   <div style={styles.cardHeader}>
                     <span style={item.isVeg ? styles.vegBadge : styles.nonVegBadge}>
                       {item.isVeg ? '● VEG' : '▲ NON-VEG'}

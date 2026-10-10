@@ -223,18 +223,29 @@ class MenuScreen extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          width: 58,
+                          height: 58,
                           color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            item.category == 'Beverages' ? '🥤' : '🍲',
-                            style: const TextStyle(fontSize: 24),
-                          ),
+                          child: item.imageUrl.isNotEmpty
+                              ? Image.network(
+                                  item.imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Center(
+                                    child: Text(
+                                      item.category == 'Hot Drinks' || item.category == 'Ice Creams' ? '🥤' : '🍲',
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    item.category == 'Hot Drinks' || item.category == 'Ice Creams' ? '🥤' : '🍲',
+                                    style: const TextStyle(fontSize: 24),
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(width: 12),

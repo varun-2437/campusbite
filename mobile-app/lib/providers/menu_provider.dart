@@ -12,7 +12,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 12,
       isVeg: false,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'sp2',
@@ -22,7 +22,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 10,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'sp3',
@@ -32,7 +32,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 12,
       isVeg: false,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1527477378392-1c0dc635c0fa?w=500&auto=format&fit=crop&q=80',
     ),
 
     // --- MAIN COURSE ---
@@ -44,7 +44,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 10,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'mc2',
@@ -54,7 +54,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 8,
       isVeg: false,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'mc3',
@@ -64,7 +64,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 12,
       isVeg: false,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'mc4',
@@ -74,7 +74,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 5,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&auto=format&fit=crop&q=80',
     ),
 
     // --- CURRIES ---
@@ -86,7 +86,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 10,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'cr2',
@@ -96,7 +96,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 12,
       isVeg: false,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'cr3',
@@ -106,7 +106,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 6,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&auto=format&fit=crop&q=80',
     ),
 
     // --- HOT DRINKS ---
@@ -118,7 +118,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 3,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'hd2',
@@ -128,7 +128,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 3,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'hd3',
@@ -138,7 +138,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 4,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=500&auto=format&fit=crop&q=80',
     ),
 
     // --- CHOCOLATES ---
@@ -150,7 +150,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 1,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'ch2',
@@ -160,7 +160,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 1,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'ch3',
@@ -170,7 +170,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 1,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1582293041079-7814c2f12063?w=500&auto=format&fit=crop&q=80',
     ),
 
     // --- ICE CREAMS ---
@@ -182,7 +182,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 4,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'ic2',
@@ -192,7 +192,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 3,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'ic3',
@@ -202,7 +202,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 2,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=500&auto=format&fit=crop&q=80',
     ),
 
     // --- DESSERTS ---
@@ -214,7 +214,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 5,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'ds2',
@@ -224,7 +224,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 3,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
     ),
     MenuItemModel(
       itemId: 'ds3',
@@ -234,7 +234,7 @@ class MenuProvider with ChangeNotifier {
       isAvailable: true,
       prepTime: 3,
       isVeg: true,
-      imageUrl: '',
+      imageUrl: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=500&auto=format&fit=crop&q=80',
     ),
   ];
 
