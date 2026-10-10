@@ -9,13 +9,16 @@ import {
   Tv,
   ExternalLink,
   Search,
-  PackageCheck
+  PackageCheck,
+  Camera
 } from 'lucide-react';
+import QrScannerModal from '../../components/common/QrScannerModal';
 
 export default function ServingCounter() {
   const { orders, updateOrderStatus } = useStore();
   const [tokenInput, setTokenInput] = useState('');
   const [handoverAlert, setHandoverAlert] = useState(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Ready orders waiting for customer pickup
   const readyOrders = orders.filter((o) => o.status === 'Ready');
@@ -89,11 +92,29 @@ export default function ServingCounter() {
               style={styles.scanInput}
             />
           </div>
+          <button
+            type="button"
+            onClick={() => setIsScannerOpen(true)}
+            style={styles.scanCameraBtn}
+          >
+            <Camera size={18} />
+            <span>Scan QR</span>
+          </button>
           <button type="submit" style={styles.handoverSubmitBtn}>
             <PackageCheck size={18} />
             <span>Confirm Handover</span>
           </button>
         </form>
+
+        <QrScannerModal
+          isOpen={isScannerOpen}
+          onClose={() => setIsScannerOpen(false)}
+          title="Scan Handover Token QR"
+          onScanSuccess={(scannedToken) => {
+            setTokenInput(scannedToken);
+            handleHandover(scannedToken);
+          }}
+        />
 
         {handoverAlert && (
           <div
@@ -263,6 +284,17 @@ const styles = {
     fontSize: '0.9rem',
     outline: 'none',
     boxSizing: 'border-box'
+  },
+  scanCameraBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+    backgroundColor: 'var(--bg-hover)',
+    color: 'var(--text-primary)',
+    padding: '0.75rem 1rem',
+    borderRadius: '8px',
+    fontWeight: '600',
+    fontSize: '0.85rem'
   },
   handoverSubmitBtn: {
     display: 'flex',

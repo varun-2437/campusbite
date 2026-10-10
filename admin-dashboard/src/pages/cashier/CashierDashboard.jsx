@@ -11,8 +11,10 @@ import {
   Trash2,
   DollarSign,
   TrendingUp,
-  Download
+  Download,
+  Camera
 } from 'lucide-react';
+import QrScannerModal from '../../components/common/QrScannerModal';
 
 export default function CashierDashboard() {
   const {
@@ -36,6 +38,30 @@ export default function CashierDashboard() {
   // Verification state
   const [verifyTokenInput, setVerifyTokenInput] = useState('');
   const [verifyStatus, setVerifyStatus] = useState(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  // Export CSV handler
+  const handleExportCSV = () => {
+    const headers = ['Order ID', 'Token #', 'Customer', 'Method', 'Amount', 'Status', 'Date'];
+    const rows = orders.map((o) => [
+      o.orderId,
+      o.tokenNumber,
+      `"${o.customerName}"`,
+      o.paymentMethod,
+      o.totalAmount,
+      o.paymentStatus,
+      `"${formatDate(o.createdAt)} ${formatTime(o.createdAt)}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `CampusBite_Transactions_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Refund state
   const [refundOrderId, setRefundOrderId] = useState('');
@@ -319,20 +345,43 @@ export default function CashierDashboard() {
           </p>
 
           <form onSubmit={handleVerifyPayment} style={styles.singleForm}>
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <input
                 type="text"
                 value={verifyTokenInput}
                 onChange={(e) => setVerifyTokenInput(e.target.value)}
                 placeholder="Scan QR or enter Token ID (e.g. TK-102)"
-                style={{ ...styles.input, flex: 1 }}
+                style={{ ...styles.input, flex: 1, minWidth: '220px' }}
               />
+              <button
+                type="button"
+                onClick={() => setIsScannerOpen(true)}
+                style={styles.scannerOpenBtn}
+              >
+                <Camera size={18} />
+                <span>Open QR Scanner</span>
+              </button>
               <button type="submit" style={styles.primaryActionBtn}>
                 <CheckCircle size={18} />
                 <span>Confirm Cash Received</span>
               </button>
             </div>
           </form>
+
+          <QrScannerModal
+            isOpen={isScannerOpen}
+            onClose={() => setIsScannerOpen(false)}
+            onScanSuccess={(scannedToken) => {
+              setVerifyTokenInput(scannedToken);
+              const success = verifyCashPayment(scannedToken);
+              if (success) {
+                setVerifyStatus({ type: 'success', msg: `Cash payment verified for ${scannedToken} via Scanner!` });
+              } else {
+                setVerifyStatus({ type: 'error', msg: `Token ${scannedToken} not found or already verified.` });
+              }
+              setTimeout(() => setVerifyStatus(null), 4000);
+            }}
+          />
 
           {verifyStatus && (
             <div
@@ -462,7 +511,7 @@ export default function CashierDashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <h3 style={styles.sectionHeading}>Today's Transaction Log</h3>
               <button
-                onClick={() => alert('Exporting CSV summary for today...')}
+                onClick={handleExportCSV}
                 style={styles.secondaryBtn}
               >
                 <Download size={16} />
@@ -819,7 +868,18 @@ const styles = {
     marginBottom: '1.5rem'
   },
   singleForm: {
-    maxWidth: '650px'
+    maxWidth: '750px'
+  },
+  scannerOpenBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem',
+    backgroundColor: 'var(--bg-hover)',
+    color: 'var(--text-primary)',
+    padding: '0.75rem 1rem',
+    borderRadius: '8px',
+    fontWeight: '600',
+    fontSize: '0.85rem'
   },
   refundForm: {
     maxWidth: '500px',

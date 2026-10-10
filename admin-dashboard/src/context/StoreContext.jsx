@@ -7,6 +7,8 @@ import {
   initialFeedback,
   initialSalesData
 } from '../services/mockData';
+import { socketService } from '../services/socket';
+import { api } from '../services/api';
 
 const StoreContext = createContext(null);
 
@@ -31,10 +33,10 @@ export const StoreProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : initialStaffAccounts;
   });
 
-  const [feedbackList] = useState(initialFeedback);
-  const [salesData] = useState(initialSalesData);
+  const [feedbackList, setFeedbackList] = useState(initialFeedback);
+  const [salesData, setSalesData] = useState(initialSalesData);
 
-  // Sync to local storage
+  // Sync to local storage for persistence across reloads
   useEffect(() => {
     localStorage.setItem('cb_orders', JSON.stringify(orders));
   }, [orders]);
@@ -51,7 +53,33 @@ export const StoreProvider = ({ children }) => {
     localStorage.setItem('cb_staff', JSON.stringify(staffList));
   }, [staffList]);
 
-  // Order actions
+  // Connect socket on mount & setup real-time event listeners
+  useEffect(() => {
+    socketService.connect();
+
+    const handleNewOrder = (incomingOrder) => {
+      setOrders((prev) => {
+        if (prev.some((o) => o.orderId === incomingOrder.orderId)) return prev;
+        return [incomingOrder, ...prev];
+      });
+    };
+
+    const handleStatusUpdate = ({ orderId, status }) => {
+      setOrders((prev) =>
+        prev.map((o) => (o.orderId === orderId ? { ...o, status } : o))
+      );
+    };
+
+    socketService.on('newOrder', handleNewOrder);
+    socketService.on('orderStatusChanged', handleStatusUpdate);
+
+    return () => {
+      socketService.off('newOrder', handleNewOrder);
+      socketService.off('orderStatusChanged', handleStatusUpdate);
+    };
+  }, []);
+
+  // --- Order Actions ---
   const addWalkInOrder = (newOrder) => {
     const nextTokenNum = 100 + orders.length + 1;
     const orderRecord = {
@@ -63,13 +91,49 @@ export const StoreProvider = ({ children }) => {
       paymentStatus: newOrder.paymentMethod === 'Cash' ? 'Pending' : 'Paid',
       ...newOrder
     };
+
     setOrders((prev) => [orderRecord, ...prev]);
+    socketService.emit('newOrder', orderRecord);
+
+    // Try background API sync
+    api.createOrder(orderRecord).catch(() => {});
     return orderRecord;
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
     setOrders((prev) =>
       prev.map((ord) => (ord.orderId === orderId ? { ...ord, status: newStatus } : ord))
+    );
+    socketService.emit('orderStatusChanged', { orderId, status: newStatus });
+
+    // Deduct stock if order marked Collected
+    if (newStatus === 'Collected') {
+      const order = orders.find((o) => o.orderId === orderId);
+      if (order) {
+        order.items?.forEach((itm) => {
+          // If bun / chicken / ingredient mapped
+          if (itm.name.toLowerCase().includes('burger')) {
+            deductInventoryByName('Burger Buns', itm.quantity);
+          }
+          if (itm.name.toLowerCase().includes('paneer')) {
+            deductInventoryByName('Paneer (Cottage Cheese)', itm.quantity * 0.1);
+          }
+        });
+      }
+    }
+
+    api.updateOrderStatus(orderId, newStatus).catch(() => {});
+  };
+
+  const deductInventoryByName = (itemName, qty) => {
+    setInventory((prev) =>
+      prev.map((item) => {
+        if (item.itemName.toLowerCase() === itemName.toLowerCase()) {
+          const newQty = Math.max(0, Math.round((item.quantity - qty) * 10) / 10);
+          return { ...item, quantity: newQty };
+        }
+        return item;
+      })
     );
   };
 
@@ -88,6 +152,11 @@ export const StoreProvider = ({ children }) => {
         return ord;
       })
     );
+
+    if (found) {
+      socketService.emit('paymentConfirmed', { tokenId: trimmed });
+      api.verifyCashPayment(trimmed).catch(() => {});
+    }
     return found;
   };
 
@@ -107,15 +176,25 @@ export const StoreProvider = ({ children }) => {
         return ord;
       })
     );
+
+    if (found) {
+      socketService.emit('orderStatusChanged', { orderId, status: 'Cancelled' });
+      api.cancelOrder(orderId, reason).catch(() => {});
+    }
     return found;
   };
 
-  // Menu actions
+  // --- Menu Actions ---
   const toggleItemAvailability = (itemId) => {
     setMenu((prev) =>
-      prev.map((item) =>
-        item.itemId === itemId ? { ...item, isAvailable: !item.isAvailable } : item
-      )
+      prev.map((item) => {
+        if (item.itemId === itemId) {
+          const updated = { ...item, isAvailable: !item.isAvailable };
+          api.updateMenuItem(itemId, updated).catch(() => {});
+          return updated;
+        }
+        return item;
+      })
     );
   };
 
@@ -125,28 +204,46 @@ export const StoreProvider = ({ children }) => {
       ...item
     };
     setMenu((prev) => [...prev, newItem]);
+    api.createMenuItem(newItem).catch(() => {});
   };
 
   const updateMenuItem = (itemId, updatedFields) => {
     setMenu((prev) =>
-      prev.map((item) => (item.itemId === itemId ? { ...item, ...updatedFields } : item))
+      prev.map((item) => {
+        if (item.itemId === itemId) {
+          const updated = { ...item, ...updatedFields };
+          api.updateMenuItem(itemId, updated).catch(() => {});
+          return updated;
+        }
+        return item;
+      })
     );
   };
 
   const deleteMenuItem = (itemId) => {
     setMenu((prev) => prev.filter((item) => item.itemId !== itemId));
+    api.deleteMenuItem(itemId).catch(() => {});
   };
 
-  // Inventory actions
+  // --- Inventory Actions ---
   const updateInventoryStock = (id, newQuantity, newThreshold) => {
     setInventory((prev) =>
-      prev.map((inv) =>
-        inv.id === id ? { ...inv, quantity: Number(newQuantity), threshold: Number(newThreshold) } : inv
-      )
+      prev.map((inv) => {
+        if (inv.id === id) {
+          const updated = {
+            ...inv,
+            quantity: Number(newQuantity),
+            threshold: Number(newThreshold)
+          };
+          api.updateInventory(id, updated.quantity, updated.threshold).catch(() => {});
+          return updated;
+        }
+        return inv;
+      })
     );
   };
 
-  // Staff actions
+  // --- Staff Actions ---
   const toggleStaffStatus = (id) => {
     setStaffList((prev) =>
       prev.map((st) => (st.id === id ? { ...st, active: !st.active } : st))
@@ -154,10 +251,13 @@ export const StoreProvider = ({ children }) => {
   };
 
   const addStaffAccount = (staff) => {
-    setStaffList((prev) => [
-      ...prev,
-      { id: `st-${Date.now().toString().slice(-4)}`, active: true, ...staff }
-    ]);
+    const newStaff = {
+      id: `st-${Date.now().toString().slice(-4)}`,
+      active: true,
+      ...staff
+    };
+    setStaffList((prev) => [...prev, newStaff]);
+    api.createStaff(newStaff).catch(() => {});
   };
 
   // Metrics
