@@ -128,7 +128,16 @@ class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final menuProv = Provider.of<MenuProvider>(context);
-    final categories = ['All', 'Breakfast', 'Lunch', 'Snacks', 'Beverages'];
+    final categories = [
+      'All',
+      'Today Spcl',
+      'Main Course',
+      'Curries',
+      'Hot Drinks',
+      'Chocolates',
+      'Ice Creams',
+      'Desserts'
+    ];
 
     return Scaffold(
       backgroundColor: AppColors.background,

@@ -4,6 +4,7 @@ import '../../config/constants.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../providers/auth_provider.dart';
+import 'mock_payment_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -39,7 +40,14 @@ class _CartScreenState extends State<CartScreen> {
 
     cart.clearCart();
 
-    Navigator.pushNamed(context, '/tracking', arguments: createdOrder);
+    if (_selectedPaymentMethod == 'Online') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => MockPaymentScreen(order: createdOrder)),
+      );
+    } else {
+      Navigator.pushNamed(context, '/tracking', arguments: createdOrder);
+    }
   }
 
   @override
