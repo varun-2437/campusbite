@@ -12,12 +12,12 @@ import {
   LogOut,
   Tv,
   Package,
-  Layers,
   Users,
-  MessageSquare
+  MessageSquare,
+  X
 } from 'lucide-react';
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen = false, onCloseMobile }) {
   const { user, logout } = useAuth();
   const { activeOrdersCount } = useStore();
   const navigate = useNavigate();
@@ -40,193 +40,135 @@ export default function Sidebar() {
     { to: '/counter', label: 'Serving Counter', icon: CheckCircle2, roles: ['counter', 'manager'] },
     { to: '/now-serving', label: 'Now Serving TV', icon: Tv, roles: ['counter', 'cashier', 'manager'] },
     { to: '/manager/menu', label: 'Menu Management', icon: UtensilsCrossed, roles: ['manager'] },
-    { to: '/manager/inventory', label: 'Inventory', icon: Package, roles: ['manager'] },
+    { to: '/manager/inventory', label: 'Inventory Stock', icon: Package, roles: ['manager'] },
     { to: '/manager/reports', label: 'Sales Reports', icon: BarChart3, roles: ['manager'] },
     { to: '/manager/staff', label: 'Staff Accounts', icon: Users, roles: ['manager'] },
-    { to: '/manager/feedback', label: 'Feedback', icon: MessageSquare, roles: ['manager'] }
+    { to: '/manager/feedback', label: 'Feedback & Reviews', icon: MessageSquare, roles: ['manager'] }
   ];
 
   const visibleItems = navItems.filter(
     (item) => !user || user.role === 'manager' || item.roles.includes(user.role)
   );
 
-  return (
-    <aside style={styles.sidebar}>
-      <div style={styles.brand}>
-        <div style={styles.logoIcon}>🍔</div>
-        <div>
-          <h2 style={styles.brandTitle}>CampusBite</h2>
-          <span style={styles.brandSubtitle}>Staff & Admin Portal</span>
+  const sidebarContent = (
+    <aside className="w-[232px] md:w-16 lg:w-[232px] h-screen bg-surface border-r border-line flex flex-col sticky top-0 transition-all duration-150 select-none z-30">
+      {/* Brand Header */}
+      <div className="h-14 px-4 flex items-center justify-between border-b border-line">
+        <div className="flex items-center gap-2.5 overflow-hidden">
+          <div className="w-8 h-8 rounded-md bg-surface-2 border border-line flex items-center justify-center text-accent shrink-0">
+            <UtensilsCrossed size={16} strokeWidth={1.75} />
+          </div>
+          <div className="md:hidden lg:block min-w-0">
+            <div className="text-[14px] font-semibold text-fg tracking-tight leading-tight truncate">
+              CampusBite
+            </div>
+            <div className="text-[11px] text-fg-muted leading-tight truncate">
+              Staff Portal
+            </div>
+          </div>
         </div>
+        {onCloseMobile && (
+          <button
+            onClick={onCloseMobile}
+            className="md:hidden btn-ghost w-8 h-8 p-0"
+            aria-label="Close navigation"
+          >
+            <X size={16} strokeWidth={1.75} />
+          </button>
+        )}
       </div>
 
-      <nav style={styles.nav}>
+      {/* Nav List */}
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto" aria-label="Staff navigation">
+        <div className="hidden lg:block px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-fg-muted">
+          Operations
+        </div>
         {visibleItems.map((item) => {
           const Icon = item.icon;
           return (
             <NavLink
               key={item.to}
               to={item.to}
-              style={({ isActive }) => ({
-                ...styles.navLink,
-                backgroundColor: isActive ? 'var(--accent-primary)' : 'transparent',
-                color: isActive ? '#fff' : 'var(--text-secondary)'
-              })}
+              onClick={onCloseMobile}
+              className={({ isActive }) =>
+                `nav-link justify-start md:justify-center lg:justify-start ${
+                  isActive ? 'nav-link-active' : ''
+                }`
+              }
+              title={item.label}
             >
-              <Icon size={18} />
-              <span style={{ flex: 1 }}>{item.label}</span>
-              {item.badge && <span style={styles.badge}>{item.badge}</span>}
+              <Icon size={18} strokeWidth={1.75} className="shrink-0" />
+              <span className="md:hidden lg:inline flex-1 truncate">{item.label}</span>
+              {item.badge && (
+                <span className="md:hidden lg:inline text-[11px] font-semibold px-1.5 py-0.5 rounded bg-danger text-white tabular-nums">
+                  {item.badge}
+                </span>
+              )}
             </NavLink>
           );
         })}
       </nav>
 
-      <div style={{ padding: '0 0.75rem 0.75rem' }}>
+      {/* Footer Mode Switcher & User Profile */}
+      <div className="p-2 border-t border-line space-y-2">
         <button
-          onClick={() => navigate('/')}
-          style={{
-            width: '100%',
-            padding: '0.65rem',
-            backgroundColor: 'rgba(249, 115, 22, 0.12)',
-            border: '1px solid rgba(249, 115, 22, 0.3)',
-            color: 'var(--accent-primary)',
-            borderRadius: '8px',
-            fontSize: '0.82rem',
-            fontWeight: '700',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            cursor: 'pointer'
+          type="button"
+          onClick={() => {
+            if (onCloseMobile) onCloseMobile();
+            navigate('/');
           }}
+          className="btn-secondary w-full text-[12.5px] h-8 px-2 justify-center gap-1.5"
+          title="Open Student Portal"
         >
-          <span>🎓 Open Student Diner App</span>
+          <UtensilsCrossed size={14} strokeWidth={1.75} />
+          <span className="md:hidden lg:inline">Student Portal</span>
         </button>
-      </div>
 
-      <div style={styles.footer}>
-        <div style={styles.userProfile}>
-          <div style={styles.avatar}>{user?.name?.charAt(0) || 'U'}</div>
-          <div style={{ overflow: 'hidden' }}>
-            <div style={styles.userName}>{user?.name || 'Staff User'}</div>
-            <div style={styles.userRole}>{user?.role?.toUpperCase()}</div>
+        <div className="pt-2 border-t border-line flex items-center justify-between gap-2 px-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-surface-2 border border-line text-[11.5px] font-medium text-fg flex items-center justify-center shrink-0">
+              {user?.name?.charAt(0) || 'S'}
+            </div>
+            <div className="md:hidden lg:block min-w-0">
+              <div className="text-[12.5px] font-medium text-fg truncate">
+                {user?.name || 'Staff User'}
+              </div>
+              <div className="text-[11px] text-fg-muted uppercase tracking-wider">
+                {user?.role || 'Staff'}
+              </div>
+            </div>
           </div>
+          <button
+            onClick={handleLogout}
+            className="btn-ghost w-7 h-7 p-0 shrink-0"
+            title="Sign out"
+            aria-label="Sign out"
+          >
+            <LogOut size={14} strokeWidth={1.75} />
+          </button>
         </div>
-        <button onClick={handleLogout} style={styles.logoutBtn} title="Sign Out">
-          <LogOut size={16} />
-        </button>
       </div>
     </aside>
   );
-}
 
-const styles = {
-  sidebar: {
-    width: '260px',
-    backgroundColor: 'var(--bg-secondary)',
-    borderRight: '1px solid var(--border-color)',
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    position: 'sticky',
-    top: 0
-  },
-  brand: {
-    padding: '1.25rem 1.5rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem',
-    borderBottom: '1px solid var(--border-color)'
-  },
-  logoIcon: {
-    fontSize: '1.8rem',
-    backgroundColor: '#334155',
-    borderRadius: '10px',
-    padding: '4px 8px'
-  },
-  brandTitle: {
-    fontSize: '1.15rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-    lineHeight: 1.2
-  },
-  brandSubtitle: {
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)'
-  },
-  nav: {
-    flex: 1,
-    padding: '1rem 0.75rem',
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.35rem'
-  },
-  navLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem',
-    padding: '0.7rem 1rem',
-    borderRadius: '8px',
-    fontSize: '0.9rem',
-    fontWeight: '500',
-    transition: 'all 0.15s ease'
-  },
-  badge: {
-    backgroundColor: '#ef4444',
-    color: '#fff',
-    borderRadius: '12px',
-    fontSize: '0.75rem',
-    padding: '2px 8px',
-    fontWeight: '700'
-  },
-  footer: {
-    padding: '1rem',
-    borderTop: '1px solid var(--border-color)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '0.5rem'
-  },
-  userProfile: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.6rem',
-    overflow: 'hidden'
-  },
-  avatar: {
-    width: '34px',
-    height: '34px',
-    borderRadius: '50%',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: '700',
-    fontSize: '0.9rem'
-  },
-  userName: {
-    fontSize: '0.85rem',
-    fontWeight: '600',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    overflow: 'hidden'
-  },
-  userRole: {
-    fontSize: '0.7rem',
-    color: 'var(--accent-secondary)',
-    fontWeight: '600'
-  },
-  logoutBtn: {
-    background: 'transparent',
-    color: 'var(--text-muted)',
-    padding: '6px',
-    borderRadius: '6px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'color 0.2s',
-    cursor: 'pointer'
-  }
-};
+  return (
+    <>
+      {/* Desktop & Tablet Sidebar */}
+      <div className="hidden md:block shrink-0">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile Drawer */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-50 md:hidden bg-black/60 backdrop-blur-[2px] flex"
+          onClick={onCloseMobile}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

@@ -1,69 +1,46 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import UnifiedNavbar from '../navigation/UnifiedNavbar';
+import { UtensilsCrossed, ShieldCheck, Cpu } from 'lucide-react';
 
 export default function StudentLayout() {
   return (
-    <div style={styles.container}>
+    <div className="min-h-screen flex flex-col bg-canvas text-fg">
+      <a
+        href="#main-student"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 btn-primary"
+      >
+        Skip to main content
+      </a>
+
+      {/* Topbar */}
       <UnifiedNavbar />
-      <main style={styles.main}>
+
+      {/* Main Page Area */}
+      <main id="main-student" tabIndex={-1} className="flex-1 w-full max-w-[1200px] mx-auto p-4 md:p-6 lg:p-7">
         <Outlet />
       </main>
-      <footer style={styles.footer}>
-        <div style={styles.footerContent}>
-          <div style={styles.footerBrand}>
-            <span>🍔</span>
-            <span style={{ fontWeight: '800', color: '#fff' }}>CampusBite</span>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-              • Smart Dining & Canteen Operations Ecosystem
-            </span>
+
+      {/* Restrained Enterprise Footer */}
+      <footer className="bg-surface border-t border-line py-4 px-4 md:px-6 mt-auto">
+        <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-fg-muted">
+          <div className="flex items-center gap-2">
+            <UtensilsCrossed size={14} strokeWidth={1.75} className="text-accent" />
+            <span className="font-semibold text-fg">CampusBite</span>
+            <span>• Canteen Ordering & Dining Management</span>
           </div>
-          <div style={styles.footerLinks}>
-            <span>⚡ Realtime Socket Sync</span>
-            <span>💳 Razorpay Simulated Sandbox</span>
-            <span>📱 Responsive Web & Mobile</span>
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-success" />
+              Realtime Sync Active
+            </span>
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck size={14} strokeWidth={1.75} className="text-accent" />
+              Razorpay Sandbox Enabled
+            </span>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: 'var(--bg-primary)'
-  },
-  main: {
-    flex: 1
-  },
-  footer: {
-    backgroundColor: 'var(--bg-secondary)',
-    borderTop: '1px solid var(--border-color)',
-    padding: '1.25rem 1.5rem',
-    marginTop: 'auto'
-  },
-  footerContent: {
-    maxWidth: '1440px',
-    margin: '0 auto',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: '1rem'
-  },
-  footerBrand: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    fontSize: '0.9rem'
-  },
-  footerLinks: {
-    display: 'flex',
-    gap: '1.25rem',
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)'
-  }
-};

@@ -2,18 +2,17 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import ItemCustomizationModal from '../../components/student/ItemCustomizationModal';
+import { PageHeader, StatusBadge, EmptyState } from '../../theme/ui';
 import {
   Search,
-  Sparkles,
-  Flame,
   Clock,
   Plus,
-  ArrowRight,
   Filter,
   CheckCircle2,
   ChevronRight,
   SlidersHorizontal,
-  ThumbsUp
+  UtensilsCrossed,
+  Tag
 } from 'lucide-react';
 
 export default function StudentHome() {
@@ -21,8 +20,7 @@ export default function StudentHome() {
     menu,
     addToCart,
     currentActiveStudentOrder,
-    studentUser,
-    activeStudentOrderId
+    studentUser
   } = useStore();
   const navigate = useNavigate();
 
@@ -43,18 +41,14 @@ export default function StudentHome() {
     'Desserts'
   ];
 
-  // Filtered menu items
   const filteredItems = useMemo(() => {
     return menu.filter((item) => {
-      // Category filter
       if (selectedCategory !== 'All' && item.category !== selectedCategory) {
         return false;
       }
-      // Veg only
       if (vegOnly && !item.isVeg) {
         return false;
       }
-      // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesName = item.name.toLowerCase().includes(q);
@@ -65,7 +59,6 @@ export default function StudentHome() {
     });
   }, [menu, selectedCategory, vegOnly, searchQuery]);
 
-  // Specials items for carousel
   const specials = useMemo(() => {
     return menu.filter((i) => i.category === 'Today Special');
   }, [menu]);
@@ -77,221 +70,294 @@ export default function StudentHome() {
     setTimeout(() => setAddedItemToast(null), 2500);
   };
 
-  const handleOpenCustomization = (item) => {
-    setCustomizingItem(item);
-  };
-
   const hasActiveOrder = currentActiveStudentOrder &&
     currentActiveStudentOrder.status !== 'Collected' &&
     currentActiveStudentOrder.status !== 'Cancelled';
 
   return (
-    <div style={styles.container}>
-      {/* Toast Notification for quick add */}
+    <div className="space-y-6">
+      {/* Toast Notification (No emojis, semantic colors) */}
       {addedItemToast && (
-        <div style={styles.toast}>
-          <CheckCircle2 size={16} color="#10b981" />
-          <span>Added <strong>{addedItemToast}</strong> to cart!</span>
+        <div
+          role="status"
+          className="fixed bottom-6 right-6 z-50 bg-surface border border-line-strong rounded-lg shadow-pop px-4 py-3 flex items-center gap-2.5 text-[13px] text-fg animate-in fade-in duration-150"
+        >
+          <CheckCircle2 size={16} strokeWidth={1.75} className="text-success shrink-0" />
+          <span>Added <strong className="font-semibold">{addedItemToast}</strong> to cart.</span>
         </div>
       )}
 
-      {/* Active Order Banner if active */}
+      {/* Active Order Notice Bar */}
       {hasActiveOrder && (
         <div
-          style={styles.activeOrderBanner}
           onClick={() => navigate('/track')}
-          title="Click to track live order"
+          className="p-3.5 bg-surface border border-accent/40 rounded-lg flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition-colors duration-150"
+          role="alert"
         >
-          <div style={styles.bannerLeft}>
-            <div style={styles.pulsingBeacon} />
-            <div>
-              <div style={styles.bannerTitle}>
-                Active Order: Token {currentActiveStudentOrder.tokenNumber} ({currentActiveStudentOrder.status})
-              </div>
-              <div style={styles.bannerSubtitle}>
-                {currentActiveStudentOrder.items?.map((i) => `${i.quantity}x ${i.name}`).join(', ')}
-              </div>
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
+            <div className="min-w-0">
+              <span className="text-[13px] font-semibold text-fg">
+                Active Order: Token {currentActiveStudentOrder.tokenNumber}
+              </span>
+              <span className="text-[12px] text-fg-muted ml-2 truncate hidden sm:inline">
+                Status: {currentActiveStudentOrder.status}
+              </span>
             </div>
           </div>
-          <div style={styles.bannerRight}>
-            <span style={styles.trackText}>Live Stepper</span>
-            <ChevronRight size={16} />
+          <div className="flex items-center gap-1 text-[12.5px] font-medium text-accent shrink-0">
+            <span>View Tracker</span>
+            <ChevronRight size={14} strokeWidth={1.75} />
           </div>
         </div>
       )}
 
-      {/* Hero Welcome & Specials Section */}
-      <section style={styles.heroSection}>
-        <div style={styles.heroContent}>
-          <div style={styles.greetingPill}>
-            <Sparkles size={14} color="var(--accent-primary)" />
-            <span>Welcome, {studentUser.isGuest ? 'Guest Diner' : studentUser.name}</span>
+      {/* Page Header (Left-aligned, 22px / 600, no emojis) */}
+      <PageHeader
+        title="Campus Canteen Menu"
+        subtitle={`Welcome, ${studentUser.isGuest ? 'Guest Diner' : studentUser.name}. Order ahead and pick up from the counter.`}
+        actions={
+          <div className="text-[12.5px] text-fg-muted font-medium bg-surface-2 px-3 py-1.5 rounded-md border border-line">
+            Loyalty: <span className="text-fg font-semibold tabular-nums">{studentUser.loyaltyPoints}</span> pts
           </div>
-          <h1 style={styles.heroHeading}>
-            Fresh Campus Meals, <br />
-            <span style={{ color: 'var(--accent-primary)' }}>Zero Waiting in Queues</span>
-          </h1>
-          <p style={styles.heroSubtext}>
-            Order ahead from your phone or laptop. Get a digital token, pick up hot & fresh from your counter.
-          </p>
-        </div>
+        }
+      />
 
-        {/* Today's Specials Carousel */}
-        <div style={styles.specialsBlock}>
-          <div style={styles.specialsHeader}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Flame size={18} color="#ef4444" />
-              <h3 style={styles.specialsTitle}>Today's Chef Specials</h3>
-            </div>
-            <span style={styles.specialsBadge}>Exclusive Deal</span>
+      {/* Today's Specials Section */}
+      {selectedCategory === 'All' && specials.length > 0 && !searchQuery && (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[17px] font-semibold text-fg">
+              Daily Kitchen Specials
+            </h2>
+            <span className="text-[12px] text-fg-muted font-medium uppercase tracking-wider">
+              Limited Availability
+            </span>
           </div>
 
-          <div style={styles.specialsScroll}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {specials.map((sp) => (
               <div
                 key={sp.itemId}
-                style={styles.specialCard}
-                onClick={() => handleOpenCustomization(sp)}
+                onClick={() => setCustomizingItem(sp)}
+                className="card p-0 overflow-hidden flex flex-col cursor-pointer group"
               >
-                <div style={styles.specialImgWrap}>
-                  <img src={sp.imageUrl} alt={sp.name} style={styles.specialImg} />
-                  <div style={styles.specialPriceBadge}>₹{sp.price}</div>
-                  <div style={styles.specialVegBadge}>
-                    <span className={sp.isVeg ? 'veg-badge' : 'non-veg-badge'} />
+                <div className="h-40 w-full overflow-hidden bg-surface-2 relative">
+                  <img
+                    src={sp.imageUrl}
+                    alt={sp.name}
+                    className="w-full h-full object-cover transition-opacity duration-150 group-hover:opacity-95"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                    <span
+                      className={`text-[11px] px-2 py-0.5 rounded font-medium ${
+                        sp.isVeg
+                          ? 'bg-success/90 text-white'
+                          : 'bg-danger/90 text-white'
+                      }`}
+                    >
+                      {sp.isVeg ? 'Veg' : 'Non-Veg'}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2.5 right-2.5 bg-black/75 text-white text-[11px] px-2 py-0.5 rounded flex items-center gap-1 font-medium">
+                    <Clock size={11} strokeWidth={1.75} />
+                    <span>{sp.prepTime} min</span>
                   </div>
                 </div>
-                <div style={styles.specialInfo}>
-                  <div style={styles.specialName}>{sp.name}</div>
-                  <div style={styles.specialMeta}>
-                    <span>⏱️ {sp.prepTime} mins</span>
+
+                <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <h3 className="text-[14px] font-semibold text-fg line-clamp-1">
+                      {sp.name}
+                    </h3>
+                    <p className="text-[12px] text-fg-muted mt-0.5">
+                      Chef recommendation for today's meal
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-line">
+                    <span className="text-[16px] font-semibold text-fg tabular-nums">
+                      ₹{sp.price}
+                    </span>
                     <button
+                      type="button"
                       onClick={(e) => handleQuickAdd(sp, e)}
-                      style={styles.quickAddBtn}
+                      className="btn-primary btn-sm"
                     >
-                      <Plus size={14} /> Add
+                      <Plus size={14} strokeWidth={1.75} />
+                      <span>Add</span>
                     </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Menu Filter Controls & Search */}
-      <section style={styles.filterSection}>
-        {/* Search Input Bar */}
-        <div style={styles.searchBar}>
-          <Search size={18} color="var(--text-muted)" />
-          <input
-            type="text"
-            placeholder="Search delicious dishes, biryani, coffee, burgers, shakes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={styles.searchInput}
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              style={{ background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
-        {/* Category Pills & Veg Toggle */}
-        <div style={styles.filterRow}>
-          <div style={styles.categoryPills}>
-            {categories.map((cat) => (
+      {/* Filter and Search Bar Row */}
+      <section className="space-y-3 pt-2">
+        <div className="flex flex-col md:flex-row gap-3">
+          {/* Search input with 14px text */}
+          <div className="relative flex-1">
+            <Search
+              size={16}
+              strokeWidth={1.75}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted"
+            />
+            <input
+              type="text"
+              placeholder="Search food by name, rice, beverages, curry..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input pl-9 text-[14px]"
+            />
+            {searchQuery && (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                style={{
-                  ...styles.catPill,
-                  backgroundColor: selectedCategory === cat ? 'var(--accent-primary)' : 'var(--bg-secondary)',
-                  color: selectedCategory === cat ? '#fff' : 'var(--text-secondary)',
-                  borderColor: selectedCategory === cat ? 'var(--accent-primary)' : 'var(--border-color)'
-                }}
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-fg-muted hover:text-fg"
               >
-                {cat}
+                Clear
               </button>
-            ))}
+            )}
           </div>
 
           {/* Veg Only Toggle */}
           <button
+            type="button"
             onClick={() => setVegOnly(!vegOnly)}
-            style={{
-              ...styles.vegToggleBtn,
-              backgroundColor: vegOnly ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-secondary)',
-              borderColor: vegOnly ? '#10b981' : 'var(--border-color)',
-              color: vegOnly ? '#10b981' : 'var(--text-secondary)'
-            }}
+            className={`btn-secondary h-9 px-3 text-[13px] shrink-0 gap-2 ${
+              vegOnly ? 'border-success text-success bg-success/5' : ''
+            }`}
           >
-            <span className="veg-badge" />
-            <span>Pure Veg Only</span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                vegOnly ? 'bg-success' : 'bg-fg-subtle'
+              }`}
+            />
+            <span>Vegetarian only</span>
           </button>
+        </div>
+
+        {/* Category Pills (horizontal scrollable) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1" role="tablist">
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                onClick={() => setSelectedCategory(cat)}
+                className={`h-8 px-3 rounded-md text-[12.5px] font-medium whitespace-nowrap border transition-colors duration-150 ${
+                  isSelected
+                    ? 'bg-accent-soft text-accent border-accent font-semibold'
+                    : 'bg-surface text-fg-muted border-line hover:bg-surface-2 hover:text-fg'
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      {/* Food Items Grid */}
-      <section style={styles.menuGridSection}>
-        <div style={styles.gridHeader}>
-          <h2 style={styles.sectionHeading}>
-            {selectedCategory === 'All' ? 'Full Campus Menu' : selectedCategory}
+      {/* Main Menu Grid */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[17px] font-semibold text-fg">
+            {selectedCategory === 'All' ? 'All Items' : selectedCategory}
           </h2>
-          <span style={styles.itemCountText}>
-            Showing {filteredItems.length} delicious choices
+          <span className="text-[12.5px] text-fg-muted tabular-nums">
+            {filteredItems.length} items available
           </span>
         </div>
 
         {filteredItems.length === 0 ? (
-          <div style={styles.emptyState}>
-            <p style={{ fontSize: '1.1rem', fontWeight: '600' }}>No items match your search or filter</p>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Try clearing the search query or switching categories.
-            </p>
-          </div>
+          <EmptyState
+            icon={UtensilsCrossed}
+            title="No items found"
+            description="No menu items matched your selected filters or search term."
+            action={
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('All');
+                  setVegOnly(false);
+                }}
+                className="btn-secondary btn-sm"
+              >
+                Reset filters
+              </button>
+            }
+          />
         ) : (
-          <div style={styles.grid}>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredItems.map((item) => (
               <div
                 key={item.itemId}
-                style={styles.itemCard}
-                onClick={() => handleOpenCustomization(item)}
+                onClick={() => setCustomizingItem(item)}
+                className="card p-0 overflow-hidden flex flex-col cursor-pointer group"
               >
-                <div style={styles.itemImgWrap}>
-                  <img src={item.imageUrl} alt={item.name} style={styles.itemImg} />
-                  <div style={styles.itemBadgeRow}>
-                    <span className={item.isVeg ? 'veg-badge' : 'non-veg-badge'} />
-                    <span style={styles.itemPrepPill}>⏱️ {item.prepTime || 8}m</span>
+                <div className="h-44 w-full overflow-hidden bg-surface-2 relative">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="w-full h-full object-cover transition-opacity duration-150 group-hover:opacity-95"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-2.5 left-2.5">
+                    <span
+                      className={`text-[11px] px-2 py-0.5 rounded font-medium ${
+                        item.isVeg
+                          ? 'bg-success/90 text-white'
+                          : 'bg-danger/90 text-white'
+                      }`}
+                    >
+                      {item.isVeg ? 'Veg' : 'Non-Veg'}
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2.5 right-2.5 bg-black/75 text-white text-[11px] px-2 py-0.5 rounded flex items-center gap-1 font-medium">
+                    <Clock size={11} strokeWidth={1.75} />
+                    <span>{item.prepTime || 8} min</span>
                   </div>
                 </div>
 
-                <div style={styles.itemBody}>
-                  <div style={styles.itemCategory}>{item.category}</div>
-                  <h3 style={styles.itemTitle}>{item.name}</h3>
+                <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <span className="text-[11px] font-medium uppercase tracking-wider text-fg-muted block">
+                      {item.category}
+                    </span>
+                    <h3 className="text-[14px] font-semibold text-fg mt-0.5 line-clamp-1">
+                      {item.name}
+                    </h3>
+                  </div>
 
-                  <div style={styles.itemFooter}>
-                    <div style={styles.itemPrice}>₹{item.price}</div>
-                    <div style={styles.cardActions}>
+                  <div className="flex items-center justify-between pt-2 border-t border-line">
+                    <span className="text-[16px] font-semibold text-fg tabular-nums">
+                      ₹{item.price}
+                    </span>
+                    <div className="flex items-center gap-1.5">
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenCustomization(item);
+                          setCustomizingItem(item);
                         }}
-                        style={styles.customizeBtn}
-                        title="Customize toppings & instructions"
+                        className="btn-secondary btn-sm"
                       >
                         Customize
                       </button>
                       <button
+                        type="button"
                         onClick={(e) => handleQuickAdd(item, e)}
-                        style={styles.addBtn}
-                        title="Quick add to cart"
+                        className="btn-primary btn-sm"
                       >
-                        <Plus size={16} />
+                        <Plus size={14} strokeWidth={1.75} />
                         <span>Add</span>
                       </button>
                     </div>
@@ -318,404 +384,3 @@ export default function StudentHome() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '1440px',
-    margin: '0 auto',
-    padding: '1.25rem 1.5rem',
-    minHeight: '100vh'
-  },
-  toast: {
-    position: 'fixed',
-    bottom: '24px',
-    right: '24px',
-    backgroundColor: '#18233c',
-    border: '1px solid #10b981',
-    color: '#fff',
-    padding: '12px 18px',
-    borderRadius: '12px',
-    boxShadow: 'var(--shadow-lg)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.6rem',
-    zIndex: 2000,
-    animation: 'slideUp 0.25s ease-out',
-    fontSize: '0.88rem'
-  },
-  activeOrderBanner: {
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
-    border: '1px solid rgba(16, 185, 129, 0.3)',
-    borderRadius: '14px',
-    padding: '0.9rem 1.25rem',
-    marginBottom: '1.5rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease'
-  },
-  bannerLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem'
-  },
-  pulsingBeacon: {
-    width: '12px',
-    height: '12px',
-    borderRadius: '50%',
-    backgroundColor: '#10b981',
-    boxShadow: '0 0 10px #10b981',
-    animation: 'pulse 1.8s infinite'
-  },
-  bannerTitle: {
-    fontSize: '0.92rem',
-    fontWeight: '700',
-    color: '#10b981'
-  },
-  bannerSubtitle: {
-    fontSize: '0.78rem',
-    color: 'var(--text-secondary)',
-    marginTop: '2px',
-    maxWidth: '500px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap'
-  },
-  bannerRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    color: '#10b981',
-    fontSize: '0.82rem',
-    fontWeight: '600'
-  },
-  trackText: {
-    marginRight: '2px'
-  },
-  heroSection: {
-    display: 'grid',
-    gridTemplateColumns: '1.1fr 1fr',
-    gap: '2rem',
-    alignItems: 'center',
-    marginBottom: '2rem',
-    backgroundColor: 'var(--bg-secondary)',
-    padding: '2rem',
-    borderRadius: '20px',
-    border: '1px solid var(--border-color)'
-  },
-  heroContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem'
-  },
-  greetingPill: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'rgba(249, 115, 22, 0.12)',
-    color: 'var(--accent-primary)',
-    padding: '4px 12px',
-    borderRadius: '20px',
-    fontSize: '0.8rem',
-    fontWeight: '600',
-    width: 'fit-content'
-  },
-  heroHeading: {
-    fontSize: '2rem',
-    fontWeight: '800',
-    lineHeight: 1.2,
-    letterSpacing: '-0.5px'
-  },
-  heroSubtext: {
-    fontSize: '0.92rem',
-    color: 'var(--text-secondary)',
-    lineHeight: 1.5,
-    maxWidth: '480px'
-  },
-  specialsBlock: {
-    backgroundColor: 'var(--bg-card)',
-    borderRadius: '16px',
-    padding: '1.25rem',
-    border: '1px solid var(--border-color)'
-  },
-  specialsHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '0.85rem'
-  },
-  specialsTitle: {
-    fontSize: '1rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  specialsBadge: {
-    backgroundColor: '#ef4444',
-    color: '#fff',
-    fontSize: '0.7rem',
-    fontWeight: '700',
-    padding: '2px 8px',
-    borderRadius: '8px'
-  },
-  specialsScroll: {
-    display: 'flex',
-    gap: '0.85rem',
-    overflowX: 'auto',
-    paddingBottom: '0.5rem'
-  },
-  specialCard: {
-    minWidth: '190px',
-    backgroundColor: 'var(--bg-secondary)',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    border: '1px solid var(--border-color)',
-    cursor: 'pointer',
-    transition: 'transform 0.2s'
-  },
-  specialImgWrap: {
-    position: 'relative',
-    height: '110px',
-    width: '100%'
-  },
-  specialImg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  specialPriceBadge: {
-    position: 'absolute',
-    bottom: '6px',
-    left: '6px',
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    color: '#fff',
-    fontSize: '0.75rem',
-    fontWeight: '700',
-    padding: '2px 6px',
-    borderRadius: '6px'
-  },
-  specialVegBadge: {
-    position: 'absolute',
-    top: '6px',
-    right: '6px',
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-    padding: '4px',
-    borderRadius: '4px'
-  },
-  specialInfo: {
-    padding: '0.75rem'
-  },
-  specialName: {
-    fontSize: '0.82rem',
-    fontWeight: '600',
-    color: 'var(--text-primary)',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  },
-  specialMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: '6px',
-    fontSize: '0.72rem',
-    color: 'var(--text-muted)'
-  },
-  quickAddBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '2px',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '3px 8px',
-    borderRadius: '6px',
-    fontSize: '0.72rem',
-    fontWeight: '700',
-    cursor: 'pointer'
-  },
-  filterSection: {
-    marginBottom: '1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem'
-  },
-  searchBar: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '12px',
-    padding: '0.75rem 1.25rem'
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    border: 'none',
-    color: 'var(--text-primary)',
-    fontSize: '0.92rem'
-  },
-  filterRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '1rem',
-    flexWrap: 'wrap'
-  },
-  categoryPills: {
-    display: 'flex',
-    gap: '0.5rem',
-    overflowX: 'auto',
-    flex: 1,
-    paddingBottom: '4px'
-  },
-  catPill: {
-    padding: '7px 14px',
-    borderRadius: '20px',
-    border: '1px solid',
-    fontSize: '0.82rem',
-    fontWeight: '600',
-    whiteSpace: 'nowrap',
-    cursor: 'pointer'
-  },
-  vegToggleBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    padding: '7px 14px',
-    borderRadius: '20px',
-    border: '1px solid',
-    fontSize: '0.82rem',
-    fontWeight: '600',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap'
-  },
-  menuGridSection: {
-    marginTop: '1rem'
-  },
-  gridHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '1rem'
-  },
-  sectionHeading: {
-    fontSize: '1.25rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  itemCountText: {
-    fontSize: '0.82rem',
-    color: 'var(--text-muted)'
-  },
-  emptyState: {
-    padding: '4rem 2rem',
-    textAlign: 'center',
-    backgroundColor: 'var(--bg-secondary)',
-    borderRadius: '16px',
-    border: '1px dashed var(--border-color)'
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '1.25rem'
-  },
-  itemCard: {
-    backgroundColor: 'var(--bg-card)',
-    borderRadius: '14px',
-    border: '1px solid var(--border-color)',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  itemImgWrap: {
-    position: 'relative',
-    height: '170px',
-    width: '100%'
-  },
-  itemImg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  itemBadgeRow: {
-    position: 'absolute',
-    top: '10px',
-    left: '10px',
-    right: '10px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    pointerEvents: 'none'
-  },
-  itemPrepPill: {
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    color: '#fff',
-    fontSize: '0.72rem',
-    fontWeight: '600',
-    padding: '3px 8px',
-    borderRadius: '6px'
-  },
-  itemBody: {
-    padding: '1rem',
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1
-  },
-  itemCategory: {
-    fontSize: '0.72rem',
-    color: 'var(--accent-secondary)',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  },
-  itemTitle: {
-    fontSize: '0.98rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-    margin: '4px 0 0.85rem 0',
-    lineHeight: 1.3
-  },
-  itemFooter: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 'auto',
-    paddingTop: '0.75rem',
-    borderTop: '1px solid rgba(255, 255, 255, 0.05)'
-  },
-  itemPrice: {
-    fontSize: '1.15rem',
-    fontWeight: '800',
-    color: 'var(--text-primary)'
-  },
-  cardActions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem'
-  },
-  customizeBtn: {
-    fontSize: '0.72rem',
-    color: 'var(--text-muted)',
-    backgroundColor: 'transparent',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    border: '1px solid var(--border-color)',
-    cursor: 'pointer'
-  },
-  addBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '3px',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '6px 14px',
-    borderRadius: '8px',
-    fontSize: '0.82rem',
-    fontWeight: '700',
-    cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)'
-  }
-};

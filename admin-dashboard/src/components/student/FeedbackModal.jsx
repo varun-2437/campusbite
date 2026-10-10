@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Star, CheckCircle2, Award, Sparkles } from 'lucide-react';
+import { X, Star, CheckCircle2, Award } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
 export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
@@ -8,17 +8,16 @@ export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
-  const [selectedTags, setSelectedTags] = useState(['Delicious Taste', 'Hot & Fresh']);
+  const [selectedTags, setSelectedTags] = useState(['Good Taste', 'Fast Prep']);
   const [submitted, setSubmitted] = useState(false);
 
   const availableTags = [
-    'Delicious Taste',
-    'Hot & Fresh',
-    'Super Fast Prep',
+    'Good Taste',
+    'Served Hot',
+    'Fast Prep',
     'Generous Portion',
     'Clean Packaging',
-    'Polite Staff',
-    'Authentic Spices'
+    'Courteous Staff'
   ];
 
   const toggleTag = (tag) => {
@@ -33,7 +32,7 @@ export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
     submitFeedback({
       orderId,
       rating,
-      comment: comment || 'Food was delicious and served on time!',
+      comment: comment || 'Food was fresh and served in good time.',
       tags: selectedTags,
       studentName: studentUser.name
     });
@@ -41,104 +40,141 @@ export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
   };
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div style={styles.header}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px]"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="w-full max-w-[460px] bg-surface border border-line rounded-xl shadow-pop overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-line flex items-center justify-between">
           <div>
-            <h3 style={styles.title}>Rate Your Food Experience</h3>
-            <span style={styles.subtitle}>Order Token: {tokenNumber} ({orderId})</span>
+            <h2 className="text-[16px] font-semibold text-fg">
+              Food & Service Feedback
+            </h2>
+            <p className="text-[12px] text-fg-muted mt-0.5">
+              Token {tokenNumber} ({orderId})
+            </p>
           </div>
-          <button onClick={onClose} style={styles.closeBtn}>
-            <X size={18} />
+          <button
+            onClick={onClose}
+            className="btn-ghost w-8 h-8 p-0 rounded"
+            aria-label="Close"
+          >
+            <X size={16} strokeWidth={1.75} />
           </button>
         </div>
 
+        {/* Content */}
         {submitted ? (
-          <div style={styles.successContent}>
-            <div style={styles.awardCircle}>
-              <Award size={40} color="#10b981" />
+          <div className="p-8 text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-success/15 text-success flex items-center justify-center mx-auto">
+              <CheckCircle2 size={24} strokeWidth={2} />
             </div>
-            <h4 style={{ fontSize: '1.2rem', fontWeight: '800', marginTop: '1rem' }}>
-              Thank You for Your Feedback!
-            </h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '6px' }}>
-              Your review helps our canteen kitchen improve and serve better meals every day.
-            </p>
-            <div style={styles.pointsBadge}>
-              <Sparkles size={16} color="var(--accent-primary)" />
-              <span>+15 Loyalty Points Added to Your Balance!</span>
+            <div>
+              <h3 className="text-[16px] font-semibold text-fg">
+                Feedback Recorded
+              </h3>
+              <p className="text-[13px] text-fg-muted mt-1">
+                Your rating has been submitted to the canteen manager. 15 loyalty points have been credited to your account.
+              </p>
             </div>
-            <button onClick={onClose} style={styles.doneBtn}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-primary w-full btn-sm h-9"
+            >
               Done
             </button>
           </div>
         ) : (
-          <div style={styles.body}>
-            {/* Star Rating Selector */}
-            <div style={styles.starsRow}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  onClick={() => setRating(star)}
-                  style={styles.starBtn}
-                >
-                  <Star
-                    size={32}
-                    fill={(hoverRating || rating) >= star ? '#f59e0b' : 'none'}
-                    color={(hoverRating || rating) >= star ? '#f59e0b' : 'var(--text-muted)'}
-                  />
-                </button>
-              ))}
-            </div>
-            <div style={styles.ratingText}>
-              {rating === 5 && 'Outstanding! 🌟🌟🌟🌟🌟'}
-              {rating === 4 && 'Very Good & Tasty! 🌟🌟🌟🌟'}
-              {rating === 3 && 'Decent / Average 🌟🌟🌟'}
-              {rating === 2 && 'Needs Improvement 🌟🌟'}
-              {rating === 1 && 'Poor Experience 🌟'}
+          <div className="p-5 space-y-5">
+            {/* Star Rating */}
+            <div className="text-center space-y-2">
+              <div className="flex justify-center gap-1.5" role="radiogroup" aria-label="Rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    onClick={() => setRating(star)}
+                    className="p-1 rounded text-fg-muted hover:text-warning transition-colors"
+                    aria-label={`${star} of 5 stars`}
+                  >
+                    <Star
+                      size={28}
+                      strokeWidth={1.75}
+                      className={
+                        (hoverRating || rating) >= star
+                          ? 'fill-warning text-warning'
+                          : 'text-line-strong'
+                      }
+                    />
+                  </button>
+                ))}
+              </div>
+              <div className="text-[12.5px] font-medium text-fg-muted">
+                {rating === 5 && '5/5 - Excellent'}
+                {rating === 4 && '4/5 - Good'}
+                {rating === 3 && '3/5 - Average'}
+                {rating === 2 && '2/5 - Fair'}
+                {rating === 1 && '1/5 - Poor'}
+              </div>
             </div>
 
             {/* Quality Tags */}
-            <div style={{ marginTop: '1.25rem' }}>
-              <label style={styles.label}>What did you like the most?</label>
-              <div style={styles.tagGrid}>
+            <div className="space-y-2">
+              <label className="label">
+                Positive Highlights
+              </label>
+              <div className="flex flex-wrap gap-1.5">
                 {availableTags.map((tag) => {
                   const isSelected = selectedTags.includes(tag);
                   return (
                     <button
                       key={tag}
+                      type="button"
                       onClick={() => toggleTag(tag)}
-                      style={{
-                        ...styles.tagBtn,
-                        backgroundColor: isSelected ? 'rgba(249, 115, 22, 0.15)' : 'var(--bg-secondary)',
-                        borderColor: isSelected ? 'var(--accent-primary)' : 'var(--border-color)',
-                        color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)'
-                      }}
+                      className={`text-[12px] px-2.5 py-1 rounded-md border transition-colors ${
+                        isSelected
+                          ? 'border-accent bg-accent-soft text-accent font-medium'
+                          : 'border-line bg-surface hover:bg-surface-2 text-fg-muted'
+                      }`}
                     >
-                      {isSelected && '✓ '} {tag}
+                      {isSelected ? '✓ ' : ''}{tag}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Comment Textarea */}
-            <div style={{ marginTop: '1.25rem' }}>
-              <label style={styles.label}>Write a review or comment for the chef (Optional)</label>
+            {/* Comment */}
+            <div>
+              <label htmlFor="feedback-comment" className="label">
+                Additional Comments (Optional)
+              </label>
               <textarea
+                id="feedback-comment"
                 rows={3}
-                placeholder="Share your thoughts on food quality, temperature, flavors..."
+                placeholder="Share any comments on taste, temperature or service..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                style={styles.textarea}
+                className="input h-auto py-2 text-[14px] resize-y"
               />
             </div>
 
-            {/* Submit Button */}
-            <button onClick={handleSubmit} style={styles.submitBtn}>
-              <span>Submit Review & Claim 15 Pts</span>
+            {/* Submit */}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="btn-primary w-full h-9 text-[13px]"
+            >
+              <span>Submit Feedback (+15 pts)</span>
             </button>
           </div>
         )}
@@ -146,149 +182,3 @@ export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
     </div>
   );
 }
-
-const styles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    backdropFilter: 'blur(5px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1400,
-    padding: '1rem'
-  },
-  modal: {
-    backgroundColor: 'var(--bg-card)',
-    borderRadius: '16px',
-    border: '1px solid var(--border-color)',
-    width: '100%',
-    maxWidth: '460px',
-    boxShadow: 'var(--shadow-lg)'
-  },
-  header: {
-    padding: '1.25rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottom: '1px solid var(--border-color)'
-  },
-  title: {
-    fontSize: '1.1rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  subtitle: {
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)'
-  },
-  closeBtn: {
-    backgroundColor: 'transparent',
-    color: 'var(--text-muted)',
-    cursor: 'pointer'
-  },
-  body: {
-    padding: '1.5rem'
-  },
-  starsRow: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '0.6rem'
-  },
-  starBtn: {
-    backgroundColor: 'transparent',
-    cursor: 'pointer',
-    padding: '4px'
-  },
-  ratingText: {
-    textAlign: 'center',
-    fontSize: '0.85rem',
-    fontWeight: '700',
-    color: 'var(--accent-warning)',
-    marginTop: '0.5rem'
-  },
-  label: {
-    display: 'block',
-    fontSize: '0.8rem',
-    fontWeight: '600',
-    color: 'var(--text-secondary)',
-    marginBottom: '0.5rem'
-  },
-  tagGrid: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '0.4rem'
-  },
-  tagBtn: {
-    padding: '5px 10px',
-    borderRadius: '16px',
-    border: '1px solid',
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    cursor: 'pointer'
-  },
-  textarea: {
-    width: '100%',
-    padding: '0.75rem',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    color: 'var(--text-primary)',
-    fontSize: '0.85rem',
-    resize: 'vertical'
-  },
-  submitBtn: {
-    width: '100%',
-    marginTop: '1.25rem',
-    padding: '0.85rem',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    borderRadius: '10px',
-    fontWeight: '700',
-    fontSize: '0.9rem',
-    cursor: 'pointer',
-    boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)'
-  },
-  successContent: {
-    padding: '3rem 2rem',
-    textAlign: 'center'
-  },
-  awardCircle: {
-    width: '70px',
-    height: '70px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto'
-  },
-  pointsBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'rgba(249, 115, 22, 0.15)',
-    color: 'var(--accent-primary)',
-    padding: '8px 16px',
-    borderRadius: '20px',
-    fontSize: '0.85rem',
-    fontWeight: '700',
-    marginTop: '1.25rem'
-  },
-  doneBtn: {
-    display: 'block',
-    width: '100%',
-    marginTop: '1.5rem',
-    padding: '0.75rem',
-    backgroundColor: 'var(--bg-secondary)',
-    color: 'var(--text-primary)',
-    borderRadius: '10px',
-    fontWeight: '600',
-    border: '1px solid var(--border-color)',
-    cursor: 'pointer'
-  }
-};

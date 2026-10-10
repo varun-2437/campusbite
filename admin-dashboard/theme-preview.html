@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlaceHub Theme Preview - CampusBite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --canvas: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --line: #e2e8f0;
+      --line-strong: #cbd5e1;
+      --accent: #0d9488;
+      --accent-hover: #0f766e;
+      --accent-soft: #ccfbf1;
+      --accent-fg: #ffffff;
+      --fg: #0f172a;
+      --fg-muted: #64748b;
+      --fg-subtle: #94a3b8;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --info: #2563eb;
+    }
+    .dark {
+      --canvas: #0b0f19;
+      --surface: #121826;
+      --surface-2: #1c2436;
+      --line: #263046;
+      --line-strong: #37415a;
+      --accent: #2dd4bf;
+      --accent-hover: #5eead4;
+      --accent-soft: #134e4a;
+      --accent-fg: #0b0f19;
+      --fg: #f1f5f9;
+      --fg-muted: #94a3b8;
+      --fg-subtle: #64748b;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --info: #60a5fa;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--canvas);
+      color: var(--fg);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 28px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+    .card {
+      background-color: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .card:hover { border-color: var(--line-strong); }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .title { font-size: 22px; font-weight: 600; }
+    .subtitle { font-size: 13px; color: var(--fg-muted); margin-top: 4px; }
+
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 768px) { .grid-4 { grid-template-columns: 1fr; } }
+
+    .btn-primary {
+      height: 36px; padding: 0 14px; font-size: 13px; font-weight: 500;
+      background-color: var(--accent); color: var(--accent-fg);
+      border-radius: 6px; border: none; cursor: pointer;
+    }
+    .btn-primary:hover { background-color: var(--accent-hover); }
+
+    .btn-secondary {
+      height: 36px; padding: 0 14px; font-size: 13px; font-weight: 500;
+      background-color: var(--surface); color: var(--fg);
+      border: 1px solid var(--line-strong); border-radius: 6px; cursor: pointer;
+    }
+    .btn-secondary:hover { background-color: var(--surface-2); }
+
+    .table-wrap {
+      border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th {
+      background: var(--surface-2); color: var(--fg-muted); font-size: 12px; font-weight: 600;
+      text-transform: uppercase; padding: 10px 16px; border-bottom: 1px solid var(--line);
+    }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: var(--surface-2); }
+    .right { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .badge-success {
+      display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px;
+      font-size: 12px; font-weight: 500; background: rgba(74, 222, 128, 0.12); color: var(--success);
+      border: 1px solid rgba(74, 222, 128, 0.25);
+    }
+    .badge-success::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    .badge-warning {
+      display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px;
+      font-size: 12px; font-weight: 500; background: rgba(251, 191, 36, 0.12); color: var(--warning);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+    }
+    .badge-warning::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--warning); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1 class="title">Theme Preview: PlaceHub Standard</h1>
+        <p class="subtitle">Restrained enterprise design system: neutral surfaces, single teal accent, no gradients, no emojis.</p>
+      </div>
+      <div>
+        <button class="btn-secondary" onclick="document.documentElement.classList.toggle('dark')">Toggle Dark / Light Mode</button>
+        <button class="btn-primary" style="margin-left: 8px;">Action Button</button>
+      </div>
+    </div>
+
+    <div class="grid-4">
+      <div class="card">
+        <span style="font-size: 12px; text-transform: uppercase; color: var(--fg-muted); font-weight: 500;">Active Orders</span>
+        <span style="font-size: 24px; font-weight: 600; display: block; margin-top: 4px;">124</span>
+      </div>
+      <div class="card">
+        <span style="font-size: 12px; text-transform: uppercase; color: var(--fg-muted); font-weight: 500;">Kitchen Queue</span>
+        <span style="font-size: 24px; font-weight: 600; display: block; margin-top: 4px;">18</span>
+      </div>
+      <div class="card">
+        <span style="font-size: 12px; text-transform: uppercase; color: var(--fg-muted); font-weight: 500;">Daily Revenue</span>
+        <span style="font-size: 24px; font-weight: 600; display: block; margin-top: 4px;">₹48,250</span>
+      </div>
+      <div class="card">
+        <span style="font-size: 12px; text-transform: uppercase; color: var(--fg-muted); font-weight: 500;">Avg. Prep Time</span>
+        <span style="font-size: 24px; font-weight: 600; display: block; margin-top: 4px;">7.4 min</span>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Token #</th>
+            <th>Customer</th>
+            <th>Item Details</th>
+            <th>Status</th>
+            <th class="right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight: 600;">TK-101</td>
+            <td>Rahul K. (Student)</td>
+            <td>1x Veg Schezwan Fried Rice, 1x Paneer Butter Masala</td>
+            <td><span class="badge-warning">Preparing</span></td>
+            <td class="right">₹205.00</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">TK-102</td>
+            <td>Ananya S. (Guest)</td>
+            <td>1x Chef Special Hyderabadi Dum Biryani</td>
+            <td><span class="badge-success">Ready</span></td>
+            <td class="right">₹160.00</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">TK-103</td>
+            <td>Sanjay M. (Student)</td>
+            <td>2x South Indian Filter Coffee</td>
+            <td><span class="badge-success">Ready</span></td>
+            <td class="right">₹50.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

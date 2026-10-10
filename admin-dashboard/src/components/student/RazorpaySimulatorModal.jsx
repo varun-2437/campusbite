@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, AlertTriangle, ShieldCheck, CreditCard, Smartphone, Building, RefreshCw } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, ShieldCheck, CreditCard, Smartphone, Building, Loader2 } from 'lucide-react';
 
-export default function RazorpaySimulatorModal({ amount, orderDetails, onSuccess, onFailure, onClose }) {
+export default function RazorpaySimulatorModal({ amount, onSuccess, onFailure, onClose }) {
   const [selectedMethod, setSelectedMethod] = useState('upi');
   const [selectedUpiApp, setSelectedUpiApp] = useState('gpay');
   const [upiId, setUpiId] = useState('student@oksbi');
@@ -10,11 +10,11 @@ export default function RazorpaySimulatorModal({ amount, orderDetails, onSuccess
 
   const handleSimulatePayment = (success = true) => {
     setProcessing(true);
-    setStatusMessage('Contacting Razorpay Secure Gateway...');
+    setStatusMessage('Connecting to Razorpay Sandbox gateway...');
 
     setTimeout(() => {
-      setStatusMessage('Authorizing transaction with bank...');
-    }, 800);
+      setStatusMessage('Authorizing transaction with issuing bank...');
+    }, 700);
 
     setTimeout(() => {
       setProcessing(false);
@@ -22,197 +22,231 @@ export default function RazorpaySimulatorModal({ amount, orderDetails, onSuccess
         const paymentId = `pay_${Date.now().toString().slice(-8)}_${Math.random().toString(36).substring(2, 6)}`;
         onSuccess(paymentId);
       } else {
-        onFailure('Payment failed or cancelled by user. Please try again.');
+        onFailure('Payment declined or cancelled by customer.');
       }
-    }, 1600);
+    }, 1500);
   };
 
   return (
-    <div style={styles.overlay} onClick={!processing ? onClose : undefined}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        {/* Razorpay Brand Bar */}
-        <div style={styles.rzpHeader}>
-          <div style={styles.rzpBrand}>
-            <div style={styles.rzpLogo}>R</div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px]"
+      onClick={!processing ? onClose : undefined}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="w-full max-w-[460px] bg-surface border border-line rounded-xl shadow-pop overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-line flex items-center justify-between bg-surface-2/40">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-md bg-accent text-accent-fg font-bold text-[14px] flex items-center justify-center">
+              R
+            </div>
             <div>
-              <div style={styles.rzpTitle}>Razorpay Gateway</div>
-              <div style={styles.rzpSubtitle}>CampusBite Secure Checkout [Sandbox]</div>
+              <div className="text-[14px] font-semibold text-fg">
+                Razorpay Checkout
+              </div>
+              <div className="text-[11px] text-fg-muted">
+                CampusBite Sandbox Environment
+              </div>
             </div>
           </div>
           {!processing && (
-            <button onClick={onClose} style={styles.closeBtn}>
-              <X size={18} />
+            <button
+              onClick={onClose}
+              className="btn-ghost w-8 h-8 p-0 rounded"
+              aria-label="Close"
+            >
+              <X size={16} strokeWidth={1.75} />
             </button>
           )}
         </div>
 
-        {/* Amount Display */}
-        <div style={styles.amountBox}>
+        {/* Amount Ribbon */}
+        <div className="px-5 py-3.5 bg-surface border-b border-line flex items-center justify-between">
           <div>
-            <div style={styles.amountLabel}>Total Payable Amount</div>
-            <div style={styles.amountValue}>₹{amount.toFixed(2)}</div>
+            <div className="text-[11.5px] text-fg-muted uppercase tracking-wider">
+              Total Amount
+            </div>
+            <div className="text-[20px] font-semibold text-fg tabular-nums">
+              ₹{amount.toFixed(2)}
+            </div>
           </div>
-          <div style={styles.secureBadge}>
-            <ShieldCheck size={16} color="#10b981" />
+          <div className="flex items-center gap-1.5 text-[12px] text-success font-medium bg-success/10 border border-success/25 px-2.5 py-1 rounded">
+            <ShieldCheck size={14} strokeWidth={1.75} />
             <span>256-bit Encrypted</span>
           </div>
         </div>
 
-        {/* Processing State */}
+        {/* Content */}
         {processing ? (
-          <div style={styles.processingState}>
-            <div style={styles.spinner} />
-            <h4 style={{ marginTop: '1rem', color: 'var(--text-primary)' }}>Processing Payment</h4>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+          <div className="py-12 px-6 text-center space-y-3">
+            <Loader2 size={32} strokeWidth={1.75} className="animate-spin text-accent mx-auto" />
+            <h3 className="text-[15px] font-semibold text-fg">
+              Processing Payment
+            </h3>
+            <p className="text-[12.5px] text-fg-muted">
               {statusMessage}
             </p>
           </div>
         ) : (
-          <div style={styles.body}>
-            {/* Method Tabs */}
-            <div style={styles.methodTabs}>
+          <div className="p-5 space-y-4">
+            {/* Payment Method Selector Tabs */}
+            <div className="flex border-b border-line" role="tablist">
               <button
+                type="button"
+                role="tab"
+                aria-selected={selectedMethod === 'upi'}
                 onClick={() => setSelectedMethod('upi')}
-                style={{
-                  ...styles.tabBtn,
-                  borderBottomColor: selectedMethod === 'upi' ? 'var(--accent-info)' : 'transparent',
-                  color: selectedMethod === 'upi' ? 'var(--accent-info)' : 'var(--text-muted)'
-                }}
+                className={`flex-1 pb-2.5 text-[12.5px] font-medium flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+                  selectedMethod === 'upi'
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-fg-muted hover:text-fg'
+                }`}
               >
-                <Smartphone size={16} />
+                <Smartphone size={14} strokeWidth={1.75} />
                 <span>UPI / QR</span>
               </button>
               <button
+                type="button"
+                role="tab"
+                aria-selected={selectedMethod === 'card'}
                 onClick={() => setSelectedMethod('card')}
-                style={{
-                  ...styles.tabBtn,
-                  borderBottomColor: selectedMethod === 'card' ? 'var(--accent-info)' : 'transparent',
-                  color: selectedMethod === 'card' ? 'var(--accent-info)' : 'var(--text-muted)'
-                }}
+                className={`flex-1 pb-2.5 text-[12.5px] font-medium flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+                  selectedMethod === 'card'
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-fg-muted hover:text-fg'
+                }`}
               >
-                <CreditCard size={16} />
+                <CreditCard size={14} strokeWidth={1.75} />
                 <span>Cards</span>
               </button>
               <button
+                type="button"
+                role="tab"
+                aria-selected={selectedMethod === 'netbanking'}
                 onClick={() => setSelectedMethod('netbanking')}
-                style={{
-                  ...styles.tabBtn,
-                  borderBottomColor: selectedMethod === 'netbanking' ? 'var(--accent-info)' : 'transparent',
-                  color: selectedMethod === 'netbanking' ? 'var(--accent-info)' : 'var(--text-muted)'
-                }}
+                className={`flex-1 pb-2.5 text-[12.5px] font-medium flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+                  selectedMethod === 'netbanking'
+                    ? 'border-accent text-accent'
+                    : 'border-transparent text-fg-muted hover:text-fg'
+                }`}
               >
-                <Building size={16} />
+                <Building size={14} strokeWidth={1.75} />
                 <span>NetBanking</span>
               </button>
             </div>
 
-            {/* UPI Option */}
             {selectedMethod === 'upi' && (
-              <div style={styles.tabContent}>
-                <div style={styles.upiGrid}>
-                  <div
-                    onClick={() => setSelectedUpiApp('gpay')}
-                    style={{
-                      ...styles.upiCard,
-                      borderColor: selectedUpiApp === 'gpay' ? '#3b82f6' : 'var(--border-color)',
-                      backgroundColor: selectedUpiApp === 'gpay' ? 'rgba(59, 130, 246, 0.1)' : 'transparent'
-                    }}
-                  >
-                    <span style={{ fontSize: '1.2rem' }}>🔵</span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>Google Pay</span>
-                  </div>
-                  <div
-                    onClick={() => setSelectedUpiApp('phonepe')}
-                    style={{
-                      ...styles.upiCard,
-                      borderColor: selectedUpiApp === 'phonepe' ? '#3b82f6' : 'var(--border-color)',
-                      backgroundColor: selectedUpiApp === 'phonepe' ? 'rgba(59, 130, 246, 0.1)' : 'transparent'
-                    }}
-                  >
-                    <span style={{ fontSize: '1.2rem' }}>🟣</span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>PhonePe</span>
-                  </div>
-                  <div
-                    onClick={() => setSelectedUpiApp('paytm')}
-                    style={{
-                      ...styles.upiCard,
-                      borderColor: selectedUpiApp === 'paytm' ? '#3b82f6' : 'var(--border-color)',
-                      backgroundColor: selectedUpiApp === 'paytm' ? 'rgba(59, 130, 246, 0.1)' : 'transparent'
-                    }}
-                  >
-                    <span style={{ fontSize: '1.2rem' }}>🔷</span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>Paytm UPI</span>
-                  </div>
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  {['Google Pay', 'PhonePe', 'Paytm'].map((app) => (
+                    <button
+                      key={app}
+                      type="button"
+                      onClick={() => setSelectedUpiApp(app.toLowerCase())}
+                      className={`p-2.5 text-center rounded border text-[12.5px] font-medium transition-colors ${
+                        selectedUpiApp === app.toLowerCase()
+                          ? 'border-accent bg-accent-soft text-accent'
+                          : 'border-line bg-surface hover:bg-surface-2 text-fg'
+                      }`}
+                    >
+                      {app}
+                    </button>
+                  ))}
                 </div>
-
-                <div style={{ marginTop: '1rem' }}>
-                  <label style={styles.inputLabel}>UPI ID / VPA</label>
+                <div>
+                  <label htmlFor="upi-vpa" className="label">
+                    UPI ID / VPA
+                  </label>
                   <input
+                    id="upi-vpa"
                     type="text"
                     value={upiId}
                     onChange={(e) => setUpiId(e.target.value)}
-                    style={styles.inputField}
+                    className="input text-[13px]"
                   />
                 </div>
               </div>
             )}
 
-            {/* Cards Option */}
             {selectedMethod === 'card' && (
-              <div style={styles.tabContent}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.inputLabel}>Card Number</label>
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="card-number" className="label">
+                    Card Number
+                  </label>
                   <input
+                    id="card-number"
                     type="text"
-                    defaultValue="4111 2222 3333 4444 (Test Visa)"
-                    style={styles.inputField}
+                    value="4111 2222 3333 4444 (Test Visa)"
                     disabled
+                    className="input text-[13px]"
                   />
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={styles.inputLabel}>Valid Thru</label>
-                    <input type="text" defaultValue="12/28" style={styles.inputField} disabled />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="card-expiry" className="label">
+                      Expiry
+                    </label>
+                    <input
+                      id="card-expiry"
+                      type="text"
+                      value="12/28"
+                      disabled
+                      className="input text-[13px]"
+                    />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={styles.inputLabel}>CVV</label>
-                    <input type="password" defaultValue="123" style={styles.inputField} disabled />
+                  <div>
+                    <label htmlFor="card-cvv" className="label">
+                      CVV
+                    </label>
+                    <input
+                      id="card-cvv"
+                      type="password"
+                      value="123"
+                      disabled
+                      className="input text-[13px]"
+                    />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* NetBanking Option */}
             {selectedMethod === 'netbanking' && (
-              <div style={styles.tabContent}>
-                <div style={styles.inputGroup}>
-                  <label style={styles.inputLabel}>Popular Banks</label>
-                  <select style={styles.inputField} defaultValue="sbi">
-                    <option value="sbi">State Bank of India (SBI)</option>
-                    <option value="hdfc">HDFC Bank</option>
-                    <option value="icici">ICICI Bank</option>
-                    <option value="axis">Axis Bank</option>
-                  </select>
-                </div>
+              <div>
+                <label htmlFor="bank-select" className="label">
+                  Select Bank
+                </label>
+                <select id="bank-select" className="input text-[13px]" defaultValue="sbi">
+                  <option value="sbi">State Bank of India (SBI)</option>
+                  <option value="hdfc">HDFC Bank</option>
+                  <option value="icici">ICICI Bank</option>
+                  <option value="axis">Axis Bank</option>
+                </select>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div style={styles.actions}>
+            {/* Test Simulation Controls */}
+            <div className="pt-2 border-t border-line space-y-2">
               <button
+                type="button"
                 onClick={() => handleSimulatePayment(true)}
-                style={styles.successBtn}
+                className="btn-primary w-full h-9 text-[13px]"
               >
-                <CheckCircle2 size={16} />
+                <CheckCircle2 size={16} strokeWidth={1.75} />
                 <span>Simulate Payment Success (₹{amount.toFixed(2)})</span>
               </button>
 
               <button
+                type="button"
                 onClick={() => handleSimulatePayment(false)}
-                style={styles.failBtn}
+                className="btn-ghost w-full h-8 text-[12.5px] text-danger hover:text-danger hover:bg-danger/10"
               >
-                <AlertTriangle size={15} />
-                <span>Simulate Payment Decline / Cancel</span>
+                <AlertCircle size={14} strokeWidth={1.75} />
+                <span>Simulate Payment Decline</span>
               </button>
             </div>
           </div>
@@ -221,201 +255,3 @@ export default function RazorpaySimulatorModal({ amount, orderDetails, onSuccess
     </div>
   );
 }
-
-const styles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    backdropFilter: 'blur(6px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1300,
-    padding: '1rem',
-    animation: 'fadeIn 0.2s ease-out'
-  },
-  modal: {
-    backgroundColor: '#0f172a',
-    borderRadius: '16px',
-    border: '1px solid #1e293b',
-    width: '100%',
-    maxWidth: '440px',
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
-    overflow: 'hidden'
-  },
-  rzpHeader: {
-    backgroundColor: '#0c2340',
-    padding: '1rem 1.25rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottom: '1px solid #1e3a5f'
-  },
-  rzpBrand: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem'
-  },
-  rzpLogo: {
-    width: '32px',
-    height: '32px',
-    borderRadius: '8px',
-    backgroundColor: '#3395ff',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontWeight: '900',
-    fontSize: '1.1rem'
-  },
-  rzpTitle: {
-    fontSize: '0.95rem',
-    fontWeight: '700',
-    color: '#fff'
-  },
-  rzpSubtitle: {
-    fontSize: '0.7rem',
-    color: '#93c5fd'
-  },
-  closeBtn: {
-    backgroundColor: 'transparent',
-    color: '#94a3b8',
-    cursor: 'pointer'
-  },
-  amountBox: {
-    backgroundColor: '#131f37',
-    padding: '1rem 1.25rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottom: '1px solid #1e293b'
-  },
-  amountLabel: {
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)'
-  },
-  amountValue: {
-    fontSize: '1.4rem',
-    fontWeight: '800',
-    color: '#fff'
-  },
-  secureBadge: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    fontSize: '0.75rem',
-    color: '#10b981',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    padding: '4px 8px',
-    borderRadius: '12px'
-  },
-  body: {
-    padding: '1.25rem'
-  },
-  methodTabs: {
-    display: 'flex',
-    borderBottom: '1px solid var(--border-color)',
-    marginBottom: '1rem'
-  },
-  tabBtn: {
-    flex: 1,
-    padding: '0.6rem',
-    backgroundColor: 'transparent',
-    borderBottom: '2px solid transparent',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.4rem',
-    fontSize: '0.82rem',
-    fontWeight: '600',
-    cursor: 'pointer'
-  },
-  tabContent: {
-    marginBottom: '1.25rem'
-  },
-  upiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '0.5rem'
-  },
-  upiCard: {
-    border: '1px solid',
-    borderRadius: '8px',
-    padding: '0.6rem 0.4rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '0.3rem',
-    cursor: 'pointer',
-    textAlign: 'center'
-  },
-  inputGroup: {
-    marginBottom: '0.75rem'
-  },
-  inputLabel: {
-    display: 'block',
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)',
-    marginBottom: '4px',
-    fontWeight: '500'
-  },
-  inputField: {
-    width: '100%',
-    padding: '0.65rem 0.8rem',
-    backgroundColor: '#1e293b',
-    border: '1px solid #334155',
-    borderRadius: '8px',
-    color: '#fff',
-    fontSize: '0.85rem'
-  },
-  actions: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.6rem',
-    paddingTop: '0.5rem'
-  },
-  successBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    backgroundColor: '#3395ff',
-    color: '#fff',
-    padding: '0.75rem',
-    borderRadius: '10px',
-    fontWeight: '700',
-    fontSize: '0.88rem',
-    cursor: 'pointer',
-    boxShadow: '0 4px 12px rgba(51, 149, 255, 0.35)'
-  },
-  failBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'transparent',
-    color: '#ef4444',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
-    padding: '0.6rem',
-    borderRadius: '8px',
-    fontSize: '0.78rem',
-    cursor: 'pointer'
-  },
-  processingState: {
-    padding: '3rem 1.5rem',
-    textAlign: 'center'
-  },
-  spinner: {
-    width: '42px',
-    height: '42px',
-    border: '4px solid rgba(51, 149, 255, 0.2)',
-    borderTopColor: '#3395ff',
-    borderRadius: '50%',
-    margin: '0 auto',
-    animation: 'pulse 1s infinite linear'
-  }
-};

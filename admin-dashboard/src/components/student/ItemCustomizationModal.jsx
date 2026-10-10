@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Plus, Minus, Check, Sparkles } from 'lucide-react';
+import { X, Plus, Minus, Check, Clock } from 'lucide-react';
+import { Field } from '../../theme/ui';
 
 export default function ItemCustomizationModal({ item, onClose, onAddToCart }) {
   if (!item) return null;
@@ -8,13 +9,12 @@ export default function ItemCustomizationModal({ item, onClose, onAddToCart }) {
   const [selectedAddOns, setSelectedAddOns] = useState([]);
   const [cookingInstructions, setCookingInstructions] = useState('');
 
-  // Context-specific add-ons based on category
   const getAvailableAddOns = () => {
     const cat = item.category?.toLowerCase() || '';
     if (cat.includes('drink') || cat.includes('beverage') || cat.includes('coffee')) {
       return [
         { id: 'ao-ice', name: 'Extra Crushed Ice', price: 0 },
-        { id: 'ao-sugar', name: 'Sugar Free / Less Sweet', price: 0 },
+        { id: 'ao-sugar', name: 'Less Sugar', price: 0 },
         { id: 'ao-choc', name: 'Whipped Cream & Chocolate Drizzle', price: 20 },
         { id: 'ao-shot', name: 'Double Espresso Shot', price: 25 }
       ];
@@ -23,14 +23,14 @@ export default function ItemCustomizationModal({ item, onClose, onAddToCart }) {
       return [
         { id: 'ao-fudge', name: 'Hot Chocolate Fudge Topping', price: 25 },
         { id: 'ao-nuts', name: 'Roasted Almonds & Cashews', price: 20 },
-        { id: 'ao-sprinkles', name: 'Choco Sprinkles & Waffle Crunch', price: 15 }
+        { id: 'ao-sprinkles', name: 'Waffle Crunch Topping', price: 15 }
       ];
     }
     return [
       { id: 'ao-cheese', name: 'Extra Melted Cheese Slice', price: 20 },
-      { id: 'ao-spicy', name: 'Extra Spicy Schezwan Toss', price: 15 },
-      { id: 'ao-mayo', name: 'Garlic Mayo Dip (50g)', price: 15 },
-      { id: 'ao-salad', name: 'Extra Fresh Onion & Lemon Salad', price: 10 }
+      { id: 'ao-spicy', name: 'Spicy Schezwan Toss', price: 15 },
+      { id: 'ao-mayo', name: 'Garlic Mayo Dip', price: 15 },
+      { id: 'ao-salad', name: 'Extra Fresh Onion & Lemon', price: 10 }
     ];
   };
 
@@ -51,62 +51,98 @@ export default function ItemCustomizationModal({ item, onClose, onAddToCart }) {
   const totalPrice = singleUnitPrice * quantity;
 
   const handleConfirm = () => {
-    onAddToCart(item, {
-      addOns: selectedAddOns,
-      instructions: cookingInstructions
-    }, quantity);
+    onAddToCart(
+      item,
+      {
+        addOns: selectedAddOns,
+        instructions: cookingInstructions
+      },
+      quantity
+    );
     onClose();
   };
 
   return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        {/* Header Image & Close */}
-        <div style={styles.imageContainer}>
-          <img src={item.imageUrl} alt={item.name} style={styles.image} />
-          <button onClick={onClose} style={styles.closeBtn} title="Close">
-            <X size={18} />
-          </button>
-          <div style={styles.badgeOverlay}>
-            <span className={item.isVeg ? 'veg-badge' : 'non-veg-badge'} />
-            <span style={styles.categoryBadge}>{item.category}</span>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[2px]"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="w-full max-w-[480px] bg-surface border border-line rounded-xl shadow-pop overflow-hidden flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-line">
+          <div>
+            <h2 className="text-[16px] font-semibold text-fg">
+              Customize Item
+            </h2>
+            <p className="text-[12px] text-fg-muted mt-0.5">
+              {item.name}
+            </p>
           </div>
+          <button
+            onClick={onClose}
+            className="btn-ghost w-8 h-8 p-0 rounded"
+            aria-label="Close"
+          >
+            <X size={16} strokeWidth={1.75} />
+          </button>
         </div>
 
-        {/* Details Section */}
-        <div style={styles.content}>
-          <div style={styles.titleRow}>
-            <div>
-              <h3 style={styles.itemName}>{item.name}</h3>
-              <p style={styles.prepTime}>⏱️ Approx {item.prepTime || 8} mins prep time</p>
+        {/* Body */}
+        <div className="p-5 overflow-y-auto flex-1 space-y-5">
+          {/* Item Summary Bar */}
+          <div className="flex items-center justify-between pb-3 border-b border-line">
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-[11px] px-2 py-0.5 rounded font-medium ${
+                  item.isVeg ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'
+                }`}
+              >
+                {item.isVeg ? 'Vegetarian' : 'Non-Vegetarian'}
+              </span>
+              <span className="text-[12px] text-fg-muted flex items-center gap-1">
+                <Clock size={12} strokeWidth={1.75} />
+                <span>{item.prepTime || 8} min prep</span>
+              </span>
             </div>
-            <div style={styles.itemPrice}>₹{item.price}</div>
+            <span className="text-[16px] font-semibold text-fg tabular-nums">
+              ₹{item.price}
+            </span>
           </div>
 
           {/* Add-ons List */}
-          <div style={styles.section}>
-            <div style={styles.sectionHeader}>
-              <Sparkles size={14} color="var(--accent-primary)" />
-              <span style={styles.sectionTitle}>Customize & Add Extras</span>
-            </div>
-            <div style={styles.addOnList}>
+          <div className="space-y-2">
+            <label className="label">
+              Add-ons & Extras
+            </label>
+            <div className="space-y-1.5">
               {addOns.map((addon) => {
                 const isSelected = selectedAddOns.some((a) => a.id === addon.id);
                 return (
                   <div
                     key={addon.id}
                     onClick={() => toggleAddOn(addon)}
-                    style={{
-                      ...styles.addOnItem,
-                      borderColor: isSelected ? 'var(--accent-primary)' : 'var(--border-color)',
-                      backgroundColor: isSelected ? 'rgba(249, 115, 22, 0.08)' : 'rgba(255, 255, 255, 0.02)'
-                    }}
+                    className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer select-none transition-colors duration-150 ${
+                      isSelected
+                        ? 'border-accent bg-accent-soft text-accent'
+                        : 'border-line bg-surface hover:bg-surface-2 text-fg'
+                    }`}
                   >
-                    <div style={styles.checkbox}>
-                      {isSelected && <Check size={14} color="var(--accent-primary)" />}
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={`w-4 h-4 rounded border flex items-center justify-center ${
+                          isSelected ? 'border-accent bg-accent text-accent-fg' : 'border-line-strong'
+                        }`}
+                      >
+                        {isSelected && <Check size={12} strokeWidth={2.5} />}
+                      </div>
+                      <span className="text-[13px] font-medium">{addon.name}</span>
                     </div>
-                    <span style={styles.addOnName}>{addon.name}</span>
-                    <span style={styles.addOnPrice}>
+                    <span className="text-[12.5px] font-medium tabular-nums text-fg-muted">
                       {addon.price > 0 ? `+₹${addon.price}` : 'Free'}
                     </span>
                   </div>
@@ -115,39 +151,68 @@ export default function ItemCustomizationModal({ item, onClose, onAddToCart }) {
             </div>
           </div>
 
-          {/* Cooking Instructions Input */}
-          <div style={styles.section}>
-            <label style={styles.label}>Special Cooking Request / Notes for Kitchen</label>
+          {/* Kitchen instructions field */}
+          <div>
+            <label htmlFor="custom-instructions" className="label">
+              Special Kitchen Instructions (Optional)
+            </label>
             <input
+              id="custom-instructions"
               type="text"
-              placeholder="e.g. Less spicy, keep sauce separate, extra hot..."
+              placeholder="e.g. Less spicy, dressing on side..."
               value={cookingInstructions}
               onChange={(e) => setCookingInstructions(e.target.value)}
-              style={styles.instructionInput}
+              className="input text-[14px]"
             />
           </div>
 
-          {/* Quantity and Total Action Bar */}
-          <div style={styles.footer}>
-            <div style={styles.quantityPicker}>
+          {/* Quantity picker */}
+          <div className="flex items-center justify-between pt-3 border-t border-line">
+            <span className="text-[13px] font-medium text-fg">Quantity</span>
+            <div className="flex items-center border border-line-strong rounded-md overflow-hidden bg-surface">
               <button
+                type="button"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                style={styles.qtyBtn}
+                className="w-8 h-8 flex items-center justify-center text-fg hover:bg-surface-2 transition-colors"
+                aria-label="Decrease quantity"
               >
-                <Minus size={14} />
+                <Minus size={14} strokeWidth={1.75} />
               </button>
-              <span style={styles.qtyText}>{quantity}</span>
+              <span className="w-10 text-center text-[13px] font-semibold text-fg tabular-nums">
+                {quantity}
+              </span>
               <button
+                type="button"
                 onClick={() => setQuantity(quantity + 1)}
-                style={styles.qtyBtn}
+                className="w-8 h-8 flex items-center justify-center text-fg hover:bg-surface-2 transition-colors"
+                aria-label="Increase quantity"
               >
-                <Plus size={14} />
+                <Plus size={14} strokeWidth={1.75} />
               </button>
             </div>
+          </div>
+        </div>
 
-            <button onClick={handleConfirm} style={styles.addBtn}>
-              <span>Add to Cart</span>
-              <span style={styles.addBtnTotal}>₹{totalPrice}</span>
+        {/* Footer */}
+        <div className="px-5 py-3 border-t border-line bg-surface-2/40 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[11px] text-fg-muted uppercase tracking-wider">Total</div>
+            <div className="text-[16px] font-semibold text-fg tabular-nums">₹{totalPrice}</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary btn-sm"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirm}
+              className="btn-primary btn-sm"
+            >
+              Add to Cart
             </button>
           </div>
         </div>
@@ -155,219 +220,3 @@ export default function ItemCustomizationModal({ item, onClose, onAddToCart }) {
     </div>
   );
 }
-
-const styles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    backdropFilter: 'blur(5px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1200,
-    padding: '1rem',
-    animation: 'fadeIn 0.2s ease-out'
-  },
-  modal: {
-    backgroundColor: 'var(--bg-card)',
-    borderRadius: '16px',
-    border: '1px solid var(--border-color)',
-    width: '100%',
-    maxWidth: '460px',
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    boxShadow: 'var(--shadow-lg)',
-    position: 'relative'
-  },
-  imageContainer: {
-    position: 'relative',
-    height: '180px',
-    width: '100%',
-    overflow: 'hidden'
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover'
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: '12px',
-    right: '12px',
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer'
-  },
-  badgeOverlay: {
-    position: 'absolute',
-    bottom: '12px',
-    left: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    backdropFilter: 'blur(4px)',
-    padding: '4px 8px',
-    borderRadius: '6px'
-  },
-  categoryBadge: {
-    fontSize: '0.75rem',
-    color: '#fff',
-    fontWeight: '600'
-  },
-  content: {
-    padding: '1.25rem'
-  },
-  titleRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '1rem',
-    borderBottom: '1px solid var(--border-color)',
-    paddingBottom: '0.75rem'
-  },
-  itemName: {
-    fontSize: '1.15rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-    marginBottom: '4px'
-  },
-  prepTime: {
-    fontSize: '0.8rem',
-    color: 'var(--text-muted)'
-  },
-  itemPrice: {
-    fontSize: '1.25rem',
-    fontWeight: '800',
-    color: 'var(--accent-primary)'
-  },
-  section: {
-    marginBottom: '1.25rem'
-  },
-  sectionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    marginBottom: '0.6rem'
-  },
-  sectionTitle: {
-    fontSize: '0.85rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px'
-  },
-  addOnList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem'
-  },
-  addOnItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.6rem',
-    padding: '0.6rem 0.85rem',
-    borderRadius: '8px',
-    border: '1px solid',
-    cursor: 'pointer',
-    userSelect: 'none'
-  },
-  checkbox: {
-    width: '18px',
-    height: '18px',
-    borderRadius: '4px',
-    border: '1.5px solid var(--border-color)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)'
-  },
-  addOnName: {
-    flex: 1,
-    fontSize: '0.85rem',
-    color: 'var(--text-primary)'
-  },
-  addOnPrice: {
-    fontSize: '0.85rem',
-    fontWeight: '600',
-    color: 'var(--accent-secondary)'
-  },
-  label: {
-    display: 'block',
-    fontSize: '0.8rem',
-    fontWeight: '600',
-    color: 'var(--text-secondary)',
-    marginBottom: '6px'
-  },
-  instructionInput: {
-    width: '100%',
-    padding: '0.65rem 0.85rem',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    color: 'var(--text-primary)',
-    fontSize: '0.85rem'
-  },
-  footer: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    paddingTop: '0.75rem',
-    borderTop: '1px solid var(--border-color)'
-  },
-  quantityPicker: {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    padding: '4px'
-  },
-  qtyBtn: {
-    width: '28px',
-    height: '28px',
-    borderRadius: '6px',
-    backgroundColor: 'transparent',
-    color: 'var(--text-primary)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer'
-  },
-  qtyText: {
-    padding: '0 0.6rem',
-    fontWeight: '700',
-    fontSize: '0.9rem',
-    color: 'var(--text-primary)'
-  },
-  addBtn: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '0.75rem 1.25rem',
-    borderRadius: '10px',
-    fontWeight: '700',
-    fontSize: '0.92rem',
-    boxShadow: '0 4px 12px rgba(249, 115, 22, 0.35)',
-    cursor: 'pointer'
-  },
-  addBtnTotal: {
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    padding: '3px 8px',
-    borderRadius: '6px',
-    fontSize: '0.85rem'
-  }
-};

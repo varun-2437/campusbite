@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
+import { PageHeader, StatusBadge, EmptyState } from '../../theme/ui';
 import {
   Clock,
   RotateCcw,
-  CheckCircle2,
-  AlertCircle,
-  ChevronRight,
-  ShoppingBag,
-  ArrowRight,
-  Filter,
   Calendar,
-  Utensils
+  UtensilsCrossed,
+  ArrowRight
 } from 'lucide-react';
 
 export default function OrderHistory() {
@@ -46,313 +42,184 @@ export default function OrderHistory() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <div>
-          <h1 style={styles.pageTitle}>Order History & Past Receipts</h1>
-          <p style={styles.pageSubtitle}>
-            Reorder your campus favorites in 1 click or track active tokens.
-          </p>
-        </div>
-
-        {/* Filter buttons */}
-        <div style={styles.filterGroup}>
-          {['All', 'Active', 'Completed', 'Cancelled'].map((st) => (
-            <button
-              key={st}
-              onClick={() => setFilterStatus(st)}
-              style={{
-                ...styles.filterBtn,
-                backgroundColor: filterStatus === st ? 'var(--accent-primary)' : 'var(--bg-secondary)',
-                color: filterStatus === st ? '#fff' : 'var(--text-secondary)',
-                borderColor: filterStatus === st ? 'var(--accent-primary)' : 'var(--border-color)'
-              }}
-            >
-              {st}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Order History"
+        subtitle="Review past receipts, track active pickups and reorder previous favorites."
+        actions={
+          <div className="flex items-center gap-1.5" role="tablist">
+            {['All', 'Active', 'Completed', 'Cancelled'].map((st) => {
+              const isSelected = filterStatus === st;
+              return (
+                <button
+                  key={st}
+                  type="button"
+                  role="tab"
+                  aria-selected={isSelected}
+                  onClick={() => setFilterStatus(st)}
+                  className={`h-8 px-2.5 rounded-md text-[12.5px] font-medium border transition-colors ${
+                    isSelected
+                      ? 'bg-accent-soft text-accent border-accent font-semibold'
+                      : 'bg-surface text-fg-muted border-line hover:bg-surface-2 hover:text-fg'
+                  }`}
+                >
+                  {st}
+                </button>
+              );
+            })}
+          </div>
+        }
+      />
 
       {filteredHistory.length === 0 ? (
-        <div style={styles.emptyCard}>
-          <Clock size={40} color="var(--text-muted)" />
-          <h3 style={{ marginTop: '1rem', color: 'var(--text-primary)' }}>No Orders Found</h3>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '4px' }}>
-            No past orders match the selected filter.
-          </p>
-          <button onClick={() => navigate('/')} style={styles.menuBtn}>
-            <Utensils size={15} />
-            <span>Browse Campus Menu</span>
-          </button>
-        </div>
+        <EmptyState
+          icon={Clock}
+          title="No Orders Found"
+          description="No previous orders match the selected status filter."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="btn-primary"
+            >
+              <UtensilsCrossed size={16} strokeWidth={1.75} />
+              <span>Browse Menu</span>
+            </button>
+          }
+        />
       ) : (
-        <div style={styles.ordersList}>
-          {filteredHistory.map((order) => {
-            const isActive = order.status !== 'Collected' && order.status !== 'Cancelled';
+        <div className="space-y-4">
+          {/* Desktop Table View */}
+          <div className="table-wrap hidden md:block">
+            <table className="table min-w-[700px]">
+              <thead>
+                <tr>
+                  <th scope="col">Token / ID</th>
+                  <th scope="col">Date & Time</th>
+                  <th scope="col">Items Ordered</th>
+                  <th scope="col">Payment</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" className="text-right">Total</th>
+                  <th scope="col" className="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredHistory.map((order) => {
+                  const isActive = order.status !== 'Collected' && order.status !== 'Cancelled';
 
-            return (
-              <div key={order.orderId} style={styles.orderCard}>
-                <div style={styles.orderCardHeader}>
-                  <div style={styles.headerLeft}>
-                    <div style={styles.tokenBadge}>{order.tokenNumber}</div>
+                  return (
+                    <tr key={order.orderId}>
+                      <td className="font-semibold text-fg">
+                        <div>{order.tokenNumber}</div>
+                        <div className="text-[11.5px] font-normal text-fg-muted">{order.orderId}</div>
+                      </td>
+                      <td className="text-fg-muted whitespace-nowrap">
+                        {new Date(order.createdAt).toLocaleDateString([], {
+                          month: 'short',
+                          day: 'numeric'
+                        })},{' '}
+                        {new Date(order.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                      <td className="max-w-[240px]">
+                        <div className="truncate text-fg">
+                          {order.items?.map((i) => `${i.quantity}x ${i.name}`).join(', ')}
+                        </div>
+                      </td>
+                      <td className="text-fg-muted">
+                        <span className="text-[12px]">
+                          {order.paymentMethod}
+                        </span>
+                      </td>
+                      <td>
+                        <StatusBadge status={order.status} />
+                      </td>
+                      <td className="text-right font-semibold text-fg tabular-nums">
+                        ₹{order.totalAmount}
+                      </td>
+                      <td className="text-right">
+                        {isActive ? (
+                          <button
+                            type="button"
+                            onClick={() => handleTrack(order)}
+                            className="btn-primary btn-sm"
+                          >
+                            <span>Track</span>
+                            <ArrowRight size={13} strokeWidth={1.75} />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleReorder(order)}
+                            className="btn-secondary btn-sm"
+                          >
+                            <RotateCcw size={13} strokeWidth={1.75} />
+                            <span>Reorder</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card List View */}
+          <div className="md:hidden space-y-3">
+            {filteredHistory.map((order) => {
+              const isActive = order.status !== 'Collected' && order.status !== 'Cancelled';
+
+              return (
+                <div key={order.orderId} className="card p-4 space-y-3">
+                  <div className="flex items-start justify-between">
                     <div>
-                      <div style={styles.orderIdText}>{order.orderId}</div>
-                      <div style={styles.orderDate}>
-                        <Calendar size={12} />
-                        <span>{new Date(order.createdAt).toLocaleString()}</span>
-                      </div>
+                      <div className="text-[15px] font-semibold text-fg">{order.tokenNumber}</div>
+                      <div className="text-[11.5px] text-fg-muted">{order.orderId}</div>
+                    </div>
+                    <StatusBadge status={order.status} />
+                  </div>
+
+                  <div className="text-[13px] text-fg-muted py-2 border-y border-line space-y-1">
+                    <div className="text-fg font-medium">
+                      {order.items?.map((i) => `${i.quantity}x ${i.name}`).join(', ')}
+                    </div>
+                    <div className="text-[12px]">
+                      {new Date(order.createdAt).toLocaleString()} • {order.paymentMethod}
                     </div>
                   </div>
 
-                  <div style={styles.headerRight}>
-                    <span
-                      style={{
-                        ...styles.statusBadge,
-                        backgroundColor:
-                          order.status === 'Ready'
-                            ? 'rgba(16, 185, 129, 0.15)'
-                            : order.status === 'Preparing'
-                            ? 'rgba(251, 146, 60, 0.15)'
-                            : order.status === 'Collected'
-                            ? 'rgba(59, 130, 246, 0.15)'
-                            : 'rgba(245, 158, 11, 0.15)',
-                        color:
-                          order.status === 'Ready'
-                            ? '#10b981'
-                            : order.status === 'Preparing'
-                            ? 'var(--accent-secondary)'
-                            : order.status === 'Collected'
-                            ? '#3b82f6'
-                            : '#f59e0b'
-                      }}
-                    >
-                      {order.status}
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[16px] font-semibold text-fg tabular-nums">
+                      ₹{order.totalAmount}
                     </span>
-                    <span style={styles.orderTotal}>₹{order.totalAmount}</span>
-                  </div>
-                </div>
-
-                {/* Items List */}
-                <div style={styles.itemsBlock}>
-                  {order.items?.map((itm, idx) => (
-                    <div key={idx} style={styles.itemRow}>
-                      <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
-                        {itm.quantity}x {itm.name}
-                      </span>
-                      <span style={{ color: 'var(--text-secondary)' }}>₹{itm.price * itm.quantity}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Card Actions Footer */}
-                <div style={styles.cardFooter}>
-                  <div style={styles.paymentMethodText}>
-                    Paid via <strong>{order.paymentMethod}</strong> ({order.paymentStatus})
-                  </div>
-
-                  <div style={styles.btnRow}>
                     {isActive ? (
                       <button
+                        type="button"
                         onClick={() => handleTrack(order)}
-                        style={styles.trackBtn}
+                        className="btn-primary btn-sm"
                       >
-                        <Clock size={14} />
-                        <span>Track Live Stepper</span>
+                        Track Stepper
                       </button>
                     ) : (
                       <button
+                        type="button"
                         onClick={() => handleReorder(order)}
-                        style={styles.reorderBtn}
+                        className="btn-secondary btn-sm"
                       >
-                        <RotateCcw size={14} />
-                        <span>Reorder in 1-Click</span>
+                        <RotateCcw size={13} strokeWidth={1.75} />
+                        <span>Reorder</span>
                       </button>
                     )}
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '1000px',
-    margin: '0 auto',
-    padding: '1.5rem',
-    minHeight: '100vh'
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '1.5rem',
-    flexWrap: 'wrap',
-    gap: '1rem'
-  },
-  pageTitle: {
-    fontSize: '1.6rem',
-    fontWeight: '800',
-    color: 'var(--text-primary)'
-  },
-  pageSubtitle: {
-    fontSize: '0.85rem',
-    color: 'var(--text-muted)',
-    marginTop: '2px'
-  },
-  filterGroup: {
-    display: 'flex',
-    gap: '0.4rem'
-  },
-  filterBtn: {
-    padding: '6px 12px',
-    borderRadius: '16px',
-    border: '1px solid',
-    fontSize: '0.8rem',
-    fontWeight: '600',
-    cursor: 'pointer'
-  },
-  ordersList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.25rem'
-  },
-  orderCard: {
-    backgroundColor: 'var(--bg-card)',
-    borderRadius: '16px',
-    border: '1px solid var(--border-color)',
-    padding: '1.25rem',
-    boxShadow: 'var(--shadow-sm)'
-  },
-  orderCardHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingBottom: '0.85rem',
-    borderBottom: '1px solid var(--border-color)',
-    flexWrap: 'wrap',
-    gap: '0.75rem'
-  },
-  headerLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem'
-  },
-  tokenBadge: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--accent-primary)',
-    color: 'var(--accent-primary)',
-    fontWeight: '800',
-    fontSize: '1rem',
-    padding: '6px 12px',
-    borderRadius: '8px'
-  },
-  orderIdText: {
-    fontSize: '0.88rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  orderDate: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)',
-    marginTop: '2px'
-  },
-  headerRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.85rem'
-  },
-  statusBadge: {
-    padding: '4px 10px',
-    borderRadius: '12px',
-    fontSize: '0.75rem',
-    fontWeight: '700'
-  },
-  orderTotal: {
-    fontSize: '1.2rem',
-    fontWeight: '900',
-    color: 'var(--text-primary)'
-  },
-  itemsBlock: {
-    padding: '0.85rem 0',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.4rem',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
-  },
-  itemRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '0.85rem'
-  },
-  cardFooter: {
-    paddingTop: '0.85rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: '0.75rem'
-  },
-  paymentMethodText: {
-    fontSize: '0.78rem',
-    color: 'var(--text-secondary)'
-  },
-  btnRow: {
-    display: 'flex',
-    gap: '0.5rem'
-  },
-  trackBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    color: '#10b981',
-    border: '1px solid rgba(16, 185, 129, 0.3)',
-    padding: '6px 14px',
-    borderRadius: '8px',
-    fontSize: '0.82rem',
-    fontWeight: '700',
-    cursor: 'pointer'
-  },
-  reorderBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '6px 14px',
-    borderRadius: '8px',
-    fontSize: '0.82rem',
-    fontWeight: '700',
-    cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(249, 115, 22, 0.3)'
-  },
-  emptyCard: {
-    backgroundColor: 'var(--bg-card)',
-    borderRadius: '16px',
-    border: '1px dashed var(--border-color)',
-    padding: '4rem 2rem',
-    textAlign: 'center'
-  },
-  menuBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '10px',
-    fontWeight: '700',
-    fontSize: '0.88rem',
-    marginTop: '1.25rem',
-    cursor: 'pointer'
-  }
-};

@@ -51,7 +51,7 @@ export default function FeedbackOverview() {
                 ...(ratingFilter === stars.toString() ? styles.filterBtnActive : {})
               }}
             >
-              {stars} ★
+              {stars} Stars
             </button>
           ))}
         </div>

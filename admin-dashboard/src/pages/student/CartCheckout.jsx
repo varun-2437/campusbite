@@ -2,20 +2,19 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import RazorpaySimulatorModal from '../../components/student/RazorpaySimulatorModal';
+import { PageHeader, EmptyState } from '../../theme/ui';
 import {
   ShoppingBag,
   Trash2,
   Plus,
   Minus,
   Tag,
-  ArrowRight,
-  ShieldCheck,
   CreditCard,
   Banknote,
-  AlertCircle,
-  Sparkles,
+  ArrowRight,
+  UtensilsCrossed,
   CheckCircle2,
-  Utensils
+  AlertCircle
 } from 'lucide-react';
 
 export default function CartCheckout() {
@@ -63,7 +62,6 @@ export default function CartCheckout() {
     if (paymentMethod === 'Online') {
       setShowRazorpayModal(true);
     } else {
-      // Cash payment at counter
       const created = placeStudentOrder({
         paymentMethod: 'Cash',
         specialInstructions
@@ -88,43 +86,52 @@ export default function CartCheckout() {
 
   if (cart.length === 0) {
     return (
-      <div style={styles.emptyContainer}>
-        <div style={styles.emptyCard}>
-          <div style={styles.emptyIconWrap}>
-            <ShoppingBag size={48} color="var(--accent-primary)" />
-          </div>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '800', marginTop: '1rem' }}>
-            Your Cart is Empty
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '6px' }}>
-            Looks like you haven't selected anything yet. Browse our campus menu and add something delicious!
-          </p>
-          <button onClick={() => navigate('/')} style={styles.exploreBtn}>
-            <Utensils size={16} />
-            <span>Explore Campus Menu</span>
-          </button>
-        </div>
+      <div className="py-12">
+        <EmptyState
+          icon={ShoppingBag}
+          title="Your Cart is Empty"
+          description="You haven't added any menu items yet. Explore the campus canteen catalog to begin."
+          action={
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="btn-primary"
+            >
+              <UtensilsCrossed size={16} strokeWidth={1.75} />
+              <span>Browse Menu</span>
+            </button>
+          }
+        />
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.pageTitle}>Review Cart & Checkout</h1>
-        <button onClick={clearCart} style={styles.clearCartBtn}>
-          <Trash2 size={14} />
-          <span>Clear All</span>
-        </button>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Cart & Checkout"
+        subtitle="Review selected meals, apply promotional vouchers and confirm order."
+        actions={
+          <button
+            type="button"
+            onClick={clearCart}
+            className="btn-secondary btn-sm text-danger hover:text-danger"
+          >
+            <Trash2 size={14} strokeWidth={1.75} />
+            <span>Clear Cart</span>
+          </button>
+        }
+      />
 
-      <div style={styles.layout}>
-        {/* Left Column: Cart Items & Instructions */}
-        <div style={styles.leftCol}>
-          {/* Cart Items List */}
-          <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Selected Food Items ({cart.length})</h3>
-            <div style={styles.itemsList}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Left Column (Items & Notes) */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="card space-y-4">
+            <h2 className="text-[14px] font-semibold text-fg pb-2 border-b border-line">
+              Selected Food Items ({cart.length})
+            </h2>
+
+            <div className="divide-y divide-line">
               {cart.map((item) => {
                 let unitPrice = item.price;
                 if (item.customization?.addOns) {
@@ -133,63 +140,83 @@ export default function CartCheckout() {
                 const itemTotal = unitPrice * item.quantity;
 
                 return (
-                  <div key={item.cartItemId} style={styles.itemRow}>
-                    <img src={item.imageUrl} alt={item.name} style={styles.itemImg} />
-                    <div style={styles.itemInfo}>
-                      <div style={styles.itemNameRow}>
-                        <span className={item.isVeg ? 'veg-badge' : 'non-veg-badge'} />
-                        <span style={styles.itemName}>{item.name}</span>
+                  <div key={item.cartItemId} className="py-3.5 flex items-start gap-4">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="w-16 h-16 rounded-md object-cover bg-surface-2 border border-line shrink-0"
+                    />
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-2 h-2 rounded-full shrink-0 ${
+                            item.isVeg ? 'bg-success' : 'bg-danger'
+                          }`}
+                        />
+                        <h3 className="text-[13.5px] font-semibold text-fg truncate">
+                          {item.name}
+                        </h3>
                       </div>
 
-                      {/* Add-on breakdown */}
                       {item.customization?.addOns && item.customization.addOns.length > 0 && (
-                        <div style={styles.addonTagList}>
+                        <div className="flex flex-wrap gap-1 mt-1">
                           {item.customization.addOns.map((a) => (
-                            <span key={a.id} style={styles.addonTag}>
+                            <span
+                              key={a.id}
+                              className="text-[11px] bg-surface-2 text-fg-muted px-1.5 py-0.5 rounded border border-line"
+                            >
                               +{a.name} ({a.price > 0 ? `₹${a.price}` : 'Free'})
                             </span>
                           ))}
                         </div>
                       )}
 
-                      {/* Note */}
                       {item.customization?.instructions && (
-                        <div style={styles.itemNote}>
+                        <p className="text-[12px] text-fg-muted italic mt-1">
                           Note: "{item.customization.instructions}"
-                        </div>
+                        </p>
                       )}
 
-                      <div style={styles.itemPriceDetail}>
+                      <div className="text-[12.5px] text-fg-muted mt-1 tabular-nums">
                         ₹{unitPrice} each
                       </div>
                     </div>
 
-                    {/* Quantity Picker & Total */}
-                    <div style={styles.itemActions}>
-                      <div style={styles.qtyPicker}>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center border border-line-strong rounded-md overflow-hidden bg-surface">
                         <button
+                          type="button"
                           onClick={() => updateCartQuantity(item.cartItemId, item.quantity - 1)}
-                          style={styles.qtyBtn}
+                          className="w-7 h-7 flex items-center justify-center text-fg hover:bg-surface-2"
+                          aria-label="Decrease quantity"
                         >
-                          <Minus size={12} />
+                          <Minus size={12} strokeWidth={1.75} />
                         </button>
-                        <span style={styles.qtyText}>{item.quantity}</span>
+                        <span className="w-8 text-center text-[12.5px] font-semibold text-fg tabular-nums">
+                          {item.quantity}
+                        </span>
                         <button
+                          type="button"
                           onClick={() => updateCartQuantity(item.cartItemId, item.quantity + 1)}
-                          style={styles.qtyBtn}
+                          className="w-7 h-7 flex items-center justify-center text-fg hover:bg-surface-2"
+                          aria-label="Increase quantity"
                         >
-                          <Plus size={12} />
+                          <Plus size={12} strokeWidth={1.75} />
                         </button>
                       </div>
 
-                      <div style={styles.itemTotal}>₹{itemTotal}</div>
+                      <span className="text-[14px] font-semibold text-fg tabular-nums min-w-[55px] text-right">
+                        ₹{itemTotal}
+                      </span>
 
                       <button
+                        type="button"
                         onClick={() => removeFromCart(item.cartItemId)}
-                        style={styles.removeBtn}
-                        title="Remove item"
+                        className="btn-ghost w-7 h-7 p-0 text-fg-muted hover:text-danger"
+                        aria-label={`Remove ${item.name}`}
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={14} strokeWidth={1.75} />
                       </button>
                     </div>
                   </div>
@@ -198,79 +225,101 @@ export default function CartCheckout() {
             </div>
           </div>
 
-          {/* Cooking Instructions / Kitchen Note */}
-          <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Kitchen Cooking Notes (Optional)</h3>
+          <div className="card space-y-2">
+            <label htmlFor="kitchen-notes" className="label">
+              General Kitchen Notes (Optional)
+            </label>
             <textarea
-              placeholder="Any general instructions for this order? (e.g., packing separate, extra cutlery, quick preparation if in a rush)"
+              id="kitchen-notes"
+              rows={2}
+              placeholder="e.g. Packing separately, need disposable cutlery..."
               value={specialInstructions}
               onChange={(e) => setSpecialInstructions(e.target.value)}
-              style={styles.textarea}
-              rows={2}
+              className="input h-auto py-2 text-[14px] resize-y"
             />
           </div>
         </div>
 
-        {/* Right Column: Coupons, Payment Method & Summary */}
-        <div style={styles.rightCol}>
-          {/* Coupons Card */}
-          <div style={styles.card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.75rem' }}>
-              <Tag size={16} color="var(--accent-primary)" />
-              <h3 style={styles.cardTitle}>Apply Promo Code</h3>
-            </div>
+        {/* Right Column (Vouchers, Payment, Summary) */}
+        <div className="space-y-4">
+          {/* Coupon Code Box */}
+          <div className="card space-y-3">
+            <h2 className="text-[14px] font-semibold text-fg pb-2 border-b border-line flex items-center gap-1.5">
+              <Tag size={15} strokeWidth={1.75} className="text-accent" />
+              <span>Promotional Voucher</span>
+            </h2>
 
             {appliedCoupon ? (
-              <div style={styles.appliedCouponBox}>
+              <div className="p-3 rounded-md bg-success/10 border border-success/30 flex items-center justify-between">
                 <div>
-                  <div style={{ fontWeight: '700', color: '#10b981', fontSize: '0.9rem' }}>
-                    Code Applied: {appliedCoupon.code}
+                  <div className="text-[13px] font-semibold text-success">
+                    {appliedCoupon.code}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <div className="text-[12px] text-fg-muted">
                     {appliedCoupon.description} (-₹{cartDiscount})
                   </div>
                 </div>
-                <button onClick={removeCoupon} style={styles.removeCouponBtn}>
+                <button
+                  type="button"
+                  onClick={removeCoupon}
+                  className="text-[12px] font-medium text-danger hover:underline"
+                >
                   Remove
                 </button>
               </div>
             ) : (
-              <div>
-                <div style={styles.couponInputRow}>
+              <div className="space-y-2">
+                <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Enter code (e.g. CAMPUS50)"
+                    placeholder="Enter code (CAMPUS50)"
                     value={couponCodeInput}
                     onChange={(e) => setCouponCodeInput(e.target.value)}
-                    style={styles.couponInput}
+                    className="input uppercase text-[13px]"
                   />
-                  <button onClick={() => handleApplyCoupon()} style={styles.applyBtn}>
+                  <button
+                    type="button"
+                    onClick={() => handleApplyCoupon()}
+                    className="btn-secondary btn-sm h-9"
+                  >
                     Apply
                   </button>
                 </div>
 
-                {couponError && <p style={styles.couponErrorText}>{couponError}</p>}
-                {couponSuccess && <p style={styles.couponSuccessText}>{couponSuccess}</p>}
+                {couponError && (
+                  <p className="text-[12px] text-danger flex items-center gap-1">
+                    <AlertCircle size={12} strokeWidth={1.75} />
+                    <span>{couponError}</span>
+                  </p>
+                )}
+                {couponSuccess && (
+                  <p className="text-[12px] text-success flex items-center gap-1">
+                    <CheckCircle2 size={12} strokeWidth={1.75} />
+                    <span>{couponSuccess}</span>
+                  </p>
+                )}
 
-                {/* Quick Coupon Suggestions */}
-                <div style={styles.quickCoupons}>
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   <button
+                    type="button"
                     onClick={() => handleApplyCoupon('CAMPUS50')}
-                    style={styles.quickCouponPill}
+                    className="text-[11.5px] px-2 py-1 rounded bg-surface-2 border border-line text-fg-muted hover:text-fg hover:border-line-strong transition-colors"
                   >
-                    🏷️ CAMPUS50 (₹50 off)
+                    CAMPUS50 (₹50 off)
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleApplyCoupon('CAMPUS20')}
-                    style={styles.quickCouponPill}
+                    className="text-[11.5px] px-2 py-1 rounded bg-surface-2 border border-line text-fg-muted hover:text-fg hover:border-line-strong transition-colors"
                   >
-                    🏷️ CAMPUS20 (20% off)
+                    CAMPUS20 (20% off)
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleApplyCoupon('STUDENT10')}
-                    style={styles.quickCouponPill}
+                    className="text-[11.5px] px-2 py-1 rounded bg-surface-2 border border-line text-fg-muted hover:text-fg hover:border-line-strong transition-colors"
                   >
-                    🏷️ STUDENT10 (10% off)
+                    STUDENT10 (10% off)
                   </button>
                 </div>
               </div>
@@ -278,49 +327,64 @@ export default function CartCheckout() {
           </div>
 
           {/* Payment Method Selector */}
-          <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Choose Payment Method</h3>
-            <div style={styles.paymentMethods}>
+          <div className="card space-y-3">
+            <h2 className="text-[14px] font-semibold text-fg pb-2 border-b border-line">
+              Payment Method
+            </h2>
+
+            <div className="space-y-2">
               <div
                 onClick={() => setPaymentMethod('Online')}
-                style={{
-                  ...styles.paymentOption,
-                  borderColor: paymentMethod === 'Online' ? 'var(--accent-primary)' : 'var(--border-color)',
-                  backgroundColor: paymentMethod === 'Online' ? 'rgba(249, 115, 22, 0.08)' : 'transparent'
-                }}
+                className={`p-3 rounded-md border cursor-pointer select-none flex items-start gap-3 transition-colors duration-150 ${
+                  paymentMethod === 'Online'
+                    ? 'border-accent bg-accent-soft text-accent'
+                    : 'border-line bg-surface hover:bg-surface-2 text-fg'
+                }`}
               >
-                <div style={styles.paymentRadio}>
-                  {paymentMethod === 'Online' && <div style={styles.radioInner} />}
+                <div
+                  className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                    paymentMethod === 'Online' ? 'border-accent' : 'border-line-strong'
+                  }`}
+                >
+                  {paymentMethod === 'Online' && (
+                    <div className="w-2 h-2 rounded-full bg-accent" />
+                  )}
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={styles.paymentOptionTitle}>
-                    <CreditCard size={15} color="var(--accent-primary)" />
+                <div className="flex-1">
+                  <div className="text-[13px] font-medium flex items-center gap-1.5">
+                    <CreditCard size={15} strokeWidth={1.75} />
                     <span>Pay Online (Razorpay)</span>
                   </div>
-                  <div style={styles.paymentOptionDesc}>
-                    UPI (GPay, PhonePe), Cards or NetBanking. Preparation starts right away!
+                  <div className="text-[12px] text-fg-muted mt-0.5">
+                    UPI, Cards or NetBanking. Cooking begins immediately.
                   </div>
                 </div>
               </div>
 
               <div
                 onClick={() => setPaymentMethod('Cash')}
-                style={{
-                  ...styles.paymentOption,
-                  borderColor: paymentMethod === 'Cash' ? 'var(--accent-primary)' : 'var(--border-color)',
-                  backgroundColor: paymentMethod === 'Cash' ? 'rgba(249, 115, 22, 0.08)' : 'transparent'
-                }}
+                className={`p-3 rounded-md border cursor-pointer select-none flex items-start gap-3 transition-colors duration-150 ${
+                  paymentMethod === 'Cash'
+                    ? 'border-accent bg-accent-soft text-accent'
+                    : 'border-line bg-surface hover:bg-surface-2 text-fg'
+                }`}
               >
-                <div style={styles.paymentRadio}>
-                  {paymentMethod === 'Cash' && <div style={styles.radioInner} />}
+                <div
+                  className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                    paymentMethod === 'Cash' ? 'border-accent' : 'border-line-strong'
+                  }`}
+                >
+                  {paymentMethod === 'Cash' && (
+                    <div className="w-2 h-2 rounded-full bg-accent" />
+                  )}
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={styles.paymentOptionTitle}>
-                    <Banknote size={15} color="var(--accent-success)" />
+                <div className="flex-1">
+                  <div className="text-[13px] font-medium flex items-center gap-1.5">
+                    <Banknote size={15} strokeWidth={1.75} />
                     <span>Pay Cash at Counter</span>
                   </div>
-                  <div style={styles.paymentOptionDesc}>
-                    Instant QR token generated. Pay cash at the cashier to start cooking.
+                  <div className="text-[12px] text-fg-muted mt-0.5">
+                    Get digital token, pay cashier directly to start prep.
                   </div>
                 </div>
               </div>
@@ -328,48 +392,53 @@ export default function CartCheckout() {
           </div>
 
           {/* Bill Summary */}
-          <div style={styles.card}>
-            <h3 style={styles.cardTitle}>Bill Details</h3>
-            <div style={styles.billRow}>
-              <span style={styles.billLabel}>Items Subtotal</span>
-              <span style={styles.billValue}>₹{cartSubtotal}</span>
-            </div>
+          <div className="card space-y-3">
+            <h2 className="text-[14px] font-semibold text-fg pb-2 border-b border-line">
+              Bill Summary
+            </h2>
 
-            {cartDiscount > 0 && (
-              <div style={styles.billRow}>
-                <span style={{ ...styles.billLabel, color: '#10b981' }}>
-                  Coupon Discount ({appliedCoupon?.code})
-                </span>
-                <span style={{ ...styles.billValue, color: '#10b981' }}>
-                  -₹{cartDiscount}
-                </span>
+            <div className="space-y-2 text-[13px]">
+              <div className="flex justify-between">
+                <span className="text-fg-muted">Subtotal</span>
+                <span className="font-medium text-fg tabular-nums">₹{cartSubtotal}</span>
               </div>
-            )}
 
-            <div style={styles.billRow}>
-              <span style={styles.billLabel}>Campus Canteen Handling Fee</span>
-              <span style={{ ...styles.billValue, color: '#10b981' }}>FREE (₹0)</span>
-            </div>
+              {cartDiscount > 0 && (
+                <div className="flex justify-between text-success">
+                  <span>Discount ({appliedCoupon?.code})</span>
+                  <span className="font-medium tabular-nums">-₹{cartDiscount}</span>
+                </div>
+              )}
 
-            <div style={styles.divider} />
+              <div className="flex justify-between text-[12px] text-fg-muted">
+                <span>Campus Handling Fee</span>
+                <span className="text-success font-medium">Free</span>
+              </div>
 
-            <div style={styles.totalRow}>
-              <div>
-                <div style={styles.totalLabel}>Total Payable</div>
-                <div style={styles.pointsEarnNote}>
-                  +{Math.floor(cartTotal / 10)} rewards points with this order
+              <div className="pt-2 border-t border-line flex items-baseline justify-between">
+                <div>
+                  <div className="text-[14px] font-semibold text-fg">Total Payable</div>
+                  <div className="text-[11px] text-fg-muted">
+                    +{Math.floor(cartTotal / 10)} loyalty points on completion
+                  </div>
+                </div>
+                <div className="text-[20px] font-semibold text-fg tabular-nums">
+                  ₹{cartTotal}
                 </div>
               </div>
-              <div style={styles.totalAmount}>₹{cartTotal}</div>
             </div>
 
-            <button onClick={handleCheckoutClick} style={styles.checkoutBtn}>
+            <button
+              type="button"
+              onClick={handleCheckoutClick}
+              className="btn-primary w-full h-10 mt-2 text-[14px]"
+            >
               <span>
                 {paymentMethod === 'Online'
                   ? `Pay ₹${cartTotal} via Razorpay`
-                  : 'Place Order & Get Cash Token'}
+                  : 'Place Cash Order & Get Token'}
               </span>
-              <ArrowRight size={18} />
+              <ArrowRight size={16} strokeWidth={1.75} />
             </button>
           </div>
         </div>
@@ -390,372 +459,3 @@ export default function CartCheckout() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '1280px',
-    margin: '0 auto',
-    padding: '1.5rem',
-    minHeight: '100vh'
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '1.5rem'
-  },
-  pageTitle: {
-    fontSize: '1.6rem',
-    fontWeight: '800',
-    color: 'var(--text-primary)'
-  },
-  clearCartBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'transparent',
-    color: '#ef4444',
-    fontSize: '0.82rem',
-    padding: '6px 12px',
-    borderRadius: '8px',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
-    cursor: 'pointer'
-  },
-  layout: {
-    display: 'grid',
-    gridTemplateColumns: '1.4fr 1fr',
-    gap: '1.5rem',
-    alignItems: 'flex-start'
-  },
-  leftCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.25rem'
-  },
-  rightCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.25rem'
-  },
-  card: {
-    backgroundColor: 'var(--bg-card)',
-    borderRadius: '16px',
-    padding: '1.25rem',
-    border: '1px solid var(--border-color)',
-    boxShadow: 'var(--shadow-sm)'
-  },
-  cardTitle: {
-    fontSize: '0.98rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-    marginBottom: '0.85rem'
-  },
-  itemsList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem'
-  },
-  itemRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    paddingBottom: '1rem',
-    borderBottom: '1px solid var(--border-color)'
-  },
-  itemImg: {
-    width: '68px',
-    height: '68px',
-    borderRadius: '10px',
-    objectFit: 'cover'
-  },
-  itemInfo: {
-    flex: 1
-  },
-  itemNameRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    marginBottom: '4px'
-  },
-  itemName: {
-    fontSize: '0.92rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  addonTagList: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '0.3rem',
-    marginTop: '2px'
-  },
-  addonTag: {
-    fontSize: '0.7rem',
-    backgroundColor: 'rgba(249, 115, 22, 0.1)',
-    color: 'var(--accent-secondary)',
-    padding: '2px 6px',
-    borderRadius: '4px'
-  },
-  itemNote: {
-    fontSize: '0.72rem',
-    color: 'var(--text-muted)',
-    fontStyle: 'italic',
-    marginTop: '2px'
-  },
-  itemPriceDetail: {
-    fontSize: '0.78rem',
-    color: 'var(--text-secondary)',
-    marginTop: '4px'
-  },
-  itemActions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem'
-  },
-  qtyPicker: {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    padding: '2px'
-  },
-  qtyBtn: {
-    width: '24px',
-    height: '24px',
-    borderRadius: '4px',
-    backgroundColor: 'transparent',
-    color: 'var(--text-primary)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer'
-  },
-  qtyText: {
-    padding: '0 0.5rem',
-    fontSize: '0.85rem',
-    fontWeight: '700'
-  },
-  itemTotal: {
-    fontSize: '0.98rem',
-    fontWeight: '700',
-    minWidth: '55px',
-    textAlign: 'right'
-  },
-  removeBtn: {
-    backgroundColor: 'transparent',
-    color: 'var(--text-muted)',
-    cursor: 'pointer',
-    padding: '4px'
-  },
-  textarea: {
-    width: '100%',
-    padding: '0.75rem',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '10px',
-    color: 'var(--text-primary)',
-    fontSize: '0.85rem',
-    resize: 'vertical'
-  },
-  appliedCouponBox: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    border: '1px solid rgba(16, 185, 129, 0.3)',
-    borderRadius: '10px',
-    padding: '0.75rem 1rem'
-  },
-  removeCouponBtn: {
-    backgroundColor: 'transparent',
-    color: '#ef4444',
-    fontSize: '0.8rem',
-    fontWeight: '600',
-    cursor: 'pointer'
-  },
-  couponInputRow: {
-    display: 'flex',
-    gap: '0.5rem'
-  },
-  couponInput: {
-    flex: 1,
-    padding: '0.65rem 0.85rem',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    color: 'var(--text-primary)',
-    fontSize: '0.85rem',
-    textTransform: 'uppercase'
-  },
-  applyBtn: {
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '0.65rem 1rem',
-    borderRadius: '8px',
-    fontSize: '0.82rem',
-    fontWeight: '700',
-    cursor: 'pointer'
-  },
-  couponErrorText: {
-    fontSize: '0.75rem',
-    color: '#ef4444',
-    marginTop: '6px'
-  },
-  couponSuccessText: {
-    fontSize: '0.75rem',
-    color: '#10b981',
-    marginTop: '6px'
-  },
-  quickCoupons: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '0.4rem',
-    marginTop: '0.75rem'
-  },
-  quickCouponPill: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px dashed var(--border-color)',
-    color: 'var(--text-secondary)',
-    fontSize: '0.72rem',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    cursor: 'pointer'
-  },
-  paymentMethods: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem'
-  },
-  paymentOption: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '0.75rem',
-    padding: '0.85rem',
-    borderRadius: '12px',
-    border: '1px solid',
-    cursor: 'pointer',
-    userSelect: 'none'
-  },
-  paymentRadio: {
-    width: '18px',
-    height: '18px',
-    borderRadius: '50%',
-    border: '2px solid var(--accent-primary)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: '2px'
-  },
-  radioInner: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-    backgroundColor: 'var(--accent-primary)'
-  },
-  paymentOptionTitle: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    fontWeight: '700',
-    fontSize: '0.88rem',
-    color: 'var(--text-primary)'
-  },
-  paymentOptionDesc: {
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)',
-    marginTop: '2px',
-    lineHeight: 1.3
-  },
-  billRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '0.85rem',
-    marginBottom: '0.6rem'
-  },
-  billLabel: {
-    color: 'var(--text-secondary)'
-  },
-  billValue: {
-    color: 'var(--text-primary)',
-    fontWeight: '600'
-  },
-  divider: {
-    height: '1px',
-    backgroundColor: 'var(--border-color)',
-    margin: '0.75rem 0'
-  },
-  totalRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '1.25rem'
-  },
-  totalLabel: {
-    fontSize: '1rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  pointsEarnNote: {
-    fontSize: '0.72rem',
-    color: 'var(--accent-primary)',
-    fontWeight: '600'
-  },
-  totalAmount: {
-    fontSize: '1.5rem',
-    fontWeight: '900',
-    color: 'var(--accent-primary)'
-  },
-  checkoutBtn: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.6rem',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '0.85rem',
-    borderRadius: '12px',
-    fontSize: '0.95rem',
-    fontWeight: '800',
-    cursor: 'pointer',
-    boxShadow: '0 4px 16px rgba(249, 115, 22, 0.35)'
-  },
-  emptyContainer: {
-    minHeight: '80vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '2rem'
-  },
-  emptyCard: {
-    backgroundColor: 'var(--bg-card)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '20px',
-    padding: '3rem 2rem',
-    textAlign: 'center',
-    maxWidth: '440px'
-  },
-  emptyIconWrap: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(249, 115, 22, 0.12)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto'
-  },
-  exploreBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '10px',
-    fontWeight: '700',
-    fontSize: '0.9rem',
-    marginTop: '1.5rem',
-    cursor: 'pointer'
-  }
-};

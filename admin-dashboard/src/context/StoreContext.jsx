@@ -82,15 +82,15 @@ export const StoreProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [
       {
         id: 'notif-1',
-        title: '🎉 Welcome to CampusBite!',
-        message: 'Order ahead, skip canteen queues & earn reward points.',
+        title: 'Welcome to CampusBite',
+        message: 'Order ahead, skip canteen queues and earn reward points.',
         time: 'Just now',
         read: false
       },
       {
         id: 'notif-2',
-        title: '🏷️ Today Special Deal',
-        message: 'Dum Biryani & Brownie combo has flat ₹50 OFF with code CAMPUS50.',
+        title: 'Today Special Deal',
+        message: 'Dum Biryani and Brownie combo has flat discount with code CAMPUS50.',
         time: '10 mins ago',
         read: false
       }
@@ -167,11 +167,11 @@ export const StoreProvider = ({ children }) => {
         addStudentNotification({
           title: `Order Update: ${status}`,
           message: status === 'Ready'
-            ? '🚀 Your order is READY for pickup at the counter!'
+            ? 'Your order is READY for pickup at the counter!'
             : status === 'Preparing'
-            ? '👨‍🍳 The kitchen is now preparing your food hot & fresh!'
+            ? 'The kitchen is now preparing your food.'
             : status === 'Collected'
-            ? '✅ Enjoy your meal! Please rate your food.'
+            ? 'Order collected. Please rate your food.'
             : `Order status is now ${status}.`
         });
       }
@@ -399,8 +399,8 @@ export const StoreProvider = ({ children }) => {
     }
 
     addStudentNotification({
-      title: '⭐ Thanks for your feedback!',
-      message: 'You received 15 bonus loyalty points for reviewing your meal!'
+      title: 'Feedback Recorded',
+      message: 'You received 15 bonus loyalty points for reviewing your meal.'
     });
 
     api.submitFeedback(newFeedback).catch(() => {});
@@ -427,8 +427,8 @@ export const StoreProvider = ({ children }) => {
 
     setAppliedCoupon(rewardCoupon);
     addStudentNotification({
-      title: '🎁 Reward Redeemed!',
-      message: `${reward.title} coupon applied to your cart!`
+      title: 'Reward Redeemed',
+      message: `${reward.title} coupon applied to your cart.`
     });
 
     return { success: true, message: 'Reward redeemed and applied to cart!' };
@@ -441,7 +441,7 @@ export const StoreProvider = ({ children }) => {
       addToCart(item, item.customization, item.quantity);
     });
     addStudentNotification({
-      title: '🛒 Items added to Cart',
+      title: 'Items added to Cart',
       message: `${order.items.length} items from previous order loaded into cart.`
     });
   };

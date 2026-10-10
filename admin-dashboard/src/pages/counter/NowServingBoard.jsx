@@ -26,7 +26,9 @@ export default function NowServingBoard() {
       {/* Top Banner */}
       <header style={styles.topHeader}>
         <div style={styles.branding}>
-          <span style={styles.logo}>🍔</span>
+          <div style={styles.logo}>
+            <Utensils size={20} strokeWidth={1.75} color="var(--accent-primary)" />
+          </div>
           <div>
             <h1 style={styles.title}>CampusBite Cafeteria</h1>
             <p style={styles.subtitle}>Order Pickup Display System</p>
@@ -92,7 +94,7 @@ export default function NowServingBoard() {
       <footer style={styles.footerTicker}>
         <Volume2 size={18} color="var(--accent-primary)" />
         <span>
-          📢 Please have your digital token QR or printed slip ready when your number is called. Thank you for dining with CampusBite!
+          Please have your digital token QR or printed slip ready when your number is called. Thank you for dining with CampusBite.
         </span>
       </footer>
     </div>
