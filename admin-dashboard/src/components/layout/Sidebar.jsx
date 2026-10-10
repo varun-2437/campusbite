@@ -81,6 +81,29 @@ export default function Sidebar() {
         })}
       </nav>
 
+      <div style={{ padding: '0 0.75rem 0.75rem' }}>
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            width: '100%',
+            padding: '0.65rem',
+            backgroundColor: 'rgba(249, 115, 22, 0.12)',
+            border: '1px solid rgba(249, 115, 22, 0.3)',
+            color: 'var(--accent-primary)',
+            borderRadius: '8px',
+            fontSize: '0.82rem',
+            fontWeight: '700',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            cursor: 'pointer'
+          }}
+        >
+          <span>🎓 Open Student Diner App</span>
+        </button>
+      </div>
+
       <div style={styles.footer}>
         <div style={styles.userProfile}>
           <div style={styles.avatar}>{user?.name?.charAt(0) || 'U'}</div>

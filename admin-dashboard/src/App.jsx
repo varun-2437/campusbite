@@ -4,8 +4,16 @@ import { AuthProvider } from './context/AuthContext';
 import { StoreProvider } from './context/StoreContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import Layout from './components/layout/Layout';
+import StudentLayout from './components/layout/StudentLayout';
 
-// Pages
+// Student Pages
+import StudentHome from './pages/student/StudentHome';
+import CartCheckout from './pages/student/CartCheckout';
+import OrderTracking from './pages/student/OrderTracking';
+import OrderHistory from './pages/student/OrderHistory';
+import LoyaltyRewards from './pages/student/LoyaltyRewards';
+
+// Staff & Admin Pages
 import Login from './pages/auth/Login';
 import CashierDashboard from './pages/cashier/CashierDashboard';
 import KitchenDashboard from './pages/kitchen/KitchenDashboard';
@@ -24,27 +32,33 @@ export default function App() {
       <AuthProvider>
         <StoreProvider>
           <Routes>
-            {/* Public Auth Route */}
+            {/* Student & Diner Experience Routes (Unified Main Interface) */}
+            <Route element={<StudentLayout />}>
+              <Route path="/" element={<StudentHome />} />
+              <Route path="/cart" element={<CartCheckout />} />
+              <Route path="/track" element={<OrderTracking />} />
+              <Route path="/track/:orderId" element={<OrderTracking />} />
+              <Route path="/history" element={<OrderHistory />} />
+              <Route path="/loyalty" element={<LoyaltyRewards />} />
+            </Route>
+
+            {/* Public Staff Auth Route */}
             <Route path="/login" element={<Login />} />
 
-            {/* Public / TV Mode for Counter */}
+            {/* Public TV Mode for Canteen Counter */}
             <Route path="/now-serving" element={<NowServingBoard />} />
 
             {/* Staff Protected App Routes */}
             <Route
-              path="/"
               element={
                 <ProtectedRoute>
                   <Layout />
                 </ProtectedRoute>
               }
             >
-              {/* Default redirect to Cashier or based on role */}
-              <Route index element={<Navigate to="/cashier" replace />} />
-
               {/* Cashier Dashboard */}
               <Route
-                path="cashier"
+                path="/cashier"
                 element={
                   <ProtectedRoute allowedRoles={['cashier', 'manager']}>
                     <CashierDashboard />
@@ -54,7 +68,7 @@ export default function App() {
 
               {/* Kitchen Display System */}
               <Route
-                path="kitchen"
+                path="/kitchen"
                 element={
                   <ProtectedRoute allowedRoles={['kitchen', 'manager']}>
                     <KitchenDashboard />
@@ -64,7 +78,7 @@ export default function App() {
 
               {/* Juice / Beverage Counter */}
               <Route
-                path="beverage"
+                path="/beverage"
                 element={
                   <ProtectedRoute allowedRoles={['beverage', 'manager']}>
                     <BeverageDashboard />
@@ -74,7 +88,7 @@ export default function App() {
 
               {/* Serving / Pickup Counter */}
               <Route
-                path="counter"
+                path="/counter"
                 element={
                   <ProtectedRoute allowedRoles={['counter', 'manager']}>
                     <ServingCounter />
@@ -84,7 +98,7 @@ export default function App() {
 
               {/* Manager Pages */}
               <Route
-                path="manager/menu"
+                path="/manager/menu"
                 element={
                   <ProtectedRoute allowedRoles={['manager']}>
                     <MenuManagement />
@@ -92,7 +106,7 @@ export default function App() {
                 }
               />
               <Route
-                path="manager/inventory"
+                path="/manager/inventory"
                 element={
                   <ProtectedRoute allowedRoles={['manager']}>
                     <InventoryManagement />
@@ -100,7 +114,7 @@ export default function App() {
                 }
               />
               <Route
-                path="manager/reports"
+                path="/manager/reports"
                 element={
                   <ProtectedRoute allowedRoles={['manager']}>
                     <SalesReports />
@@ -108,7 +122,7 @@ export default function App() {
                 }
               />
               <Route
-                path="manager/staff"
+                path="/manager/staff"
                 element={
                   <ProtectedRoute allowedRoles={['manager']}>
                     <StaffAccounts />
@@ -116,7 +130,7 @@ export default function App() {
                 }
               />
               <Route
-                path="manager/feedback"
+                path="/manager/feedback"
                 element={
                   <ProtectedRoute allowedRoles={['manager']}>
                     <FeedbackOverview />
@@ -125,8 +139,8 @@ export default function App() {
               />
             </Route>
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            {/* Fallback to Home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </StoreProvider>
       </AuthProvider>

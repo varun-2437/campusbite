@@ -1,0 +1,12 @@
+{
+  "name": "campusbite",
+  "version": "1.0.0",
+  "description": "CampusBite - Unified Smart Campus Dining & Canteen Management Platform",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix admin-dashboard run dev",
+    "build": "npm --prefix admin-dashboard run build",
+    "preview": "npm --prefix admin-dashboard run preview",
+    "backend": "npm --prefix backend run dev"
+  }
+}
