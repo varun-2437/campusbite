@@ -8,7 +8,7 @@
 
 import { io } from 'socket.io-client';
 
-const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_URL || 'https://campusbite-backend-k49x.onrender.com';
 
 class SocketService {
   constructor() {
