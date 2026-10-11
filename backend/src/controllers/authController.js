@@ -6,27 +6,50 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, studentId } = req.body;
+    const { name, email, password, studentId, role = 'student', shift = 'Morning' } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
-    // Validate college email domain if required
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(409).json({ message: 'Email address already registered' });
     }
 
+    const isStudent = role === 'student';
+    const approvalStatus = isStudent ? 'approved' : 'pending';
+    const active = isStudent; // Students are active instantly; staff must be approved
+
     const newUser = await User.create({
       name,
       email: email.toLowerCase(),
       password,
-      role: 'student',
-      studentId: studentId || `STU-${Date.now().toString().slice(-4)}`,
-      loyaltyPoints: 0
+      role: isStudent ? 'student' : role,
+      studentId: isStudent ? (studentId || `STU-${Date.now().toString().slice(-4)}`) : undefined,
+      staffId: !isStudent ? `STF-${Date.now().toString().slice(-4)}` : undefined,
+      shift: !isStudent ? shift : undefined,
+      loyaltyPoints: 0,
+      active,
+      approvalStatus
     });
 
+    // If staff account, require Store Manager approval
+    if (!isStudent) {
+      return res.status(201).json({
+        message: 'Staff registration submitted! A Store Manager must approve your account before you can log in.',
+        pendingApproval: true,
+        user: {
+          id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+          approvalStatus: newUser.approvalStatus
+        }
+      });
+    }
+
+    // Students get immediate access with JWT
     const token = jwt.sign(
       { userId: newUser._id, email: newUser.email, role: newUser.role, studentId: newUser.studentId },
       JWT_SECRET,
@@ -42,7 +65,8 @@ export const register = async (req, res) => {
         email: newUser.email,
         role: newUser.role,
         studentId: newUser.studentId,
-        loyaltyPoints: newUser.loyaltyPoints
+        loyaltyPoints: newUser.loyaltyPoints,
+        approvalStatus: newUser.approvalStatus
       }
     });
   } catch (err) {
@@ -52,36 +76,39 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    let user = await User.findOne({ email: email.toLowerCase() });
-
-    // Auto-seed demo staff account if testing locally without pre-existing DB
-    if (!user && (email.includes('campusbite.com') || role)) {
-      user = await User.create({
-        name: `${(role || 'staff').toUpperCase()} User`,
-        email: email.toLowerCase(),
-        password,
-        role: role || 'manager',
-        active: true
-      });
-    }
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Check Approval Status
+    if (user.approvalStatus === 'pending') {
+      return res.status(403).json({
+        message: 'Your staff account is pending approval from the Store Manager. Please check back once approved.',
+        pendingApproval: true
+      });
+    }
+
+    if (user.approvalStatus === 'rejected') {
+      return res.status(403).json({
+        message: 'Your account application was declined by the Store Manager.'
+      });
     }
 
     if (!user.active) {
-      return res.status(403).json({ message: 'Account has been deactivated. Contact manager.' });
+      return res.status(403).json({ message: 'Account has been deactivated. Contact the Store Manager.' });
     }
 
     const token = jwt.sign(
@@ -105,7 +132,8 @@ export const login = async (req, res) => {
         email: user.email,
         role: user.role,
         studentId: user.studentId,
-        loyaltyPoints: user.loyaltyPoints
+        loyaltyPoints: user.loyaltyPoints,
+        approvalStatus: user.approvalStatus
       }
     });
   } catch (err) {

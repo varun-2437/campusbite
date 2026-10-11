@@ -114,22 +114,43 @@ async function seedDatabase() {
     const insertedMenu = await MenuItem.insertMany(seedMenuItems);
     console.log(`✅ Inserted ${insertedMenu.length} menu items into Atlas!`);
 
-    // 2. Seed Staff Accounts
-    console.log('Seeding staff accounts...');
+    // 2. Seed Staff Accounts with Encrypted Passwords
+    console.log('Seeding staff and student accounts with bcrypt encryption...');
     await User.deleteMany({});
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash('password123', salt);
+
+    const makeHash = async (pw) => bcrypt.hash(pw, salt);
 
     const staffUsers = [
-      { name: 'Store Manager (Varun)', email: 'varun.manager@campusbite.com', password: hashedPassword, role: 'manager', shift: 'Admin' },
-      { name: 'Cashier Staff', email: 'gokul.cashier@campusbite.com', password: hashedPassword, role: 'cashier', shift: 'Morning' },
-      { name: 'Kitchen Head Chef', email: 'anthony.kitchen@campusbite.com', password: hashedPassword, role: 'kitchen', shift: 'All-Day' },
-      { name: 'Juice Bar Specialist', email: 'ravi.juice@campusbite.com', password: hashedPassword, role: 'beverage', shift: 'Morning' },
-      { name: 'Order Handover Staff', email: 'divya.counter@campusbite.com', password: hashedPassword, role: 'counter', shift: 'Evening' },
-      { name: 'Student Krithik', email: 'krithik.student@campusbite.com', password: hashedPassword, role: 'student', shift: 'Day' }
+      // 1. Manager / Admin
+      { name: 'Store Manager (Varun)', email: 'manager@campusbite.com', password: await makeHash('Manager@123'), role: 'manager', shift: 'Admin', active: true, approvalStatus: 'approved' },
+      { name: 'Varun Admin', email: 'varun.manager@campusbite.com', password: await makeHash('Manager@123'), role: 'manager', shift: 'Admin', active: true, approvalStatus: 'approved' },
+
+      // 2. Cashier POS
+      { name: 'Gokul (Cashier)', email: 'cashier@campusbite.com', password: await makeHash('Cashier@123'), role: 'cashier', shift: 'Morning', active: true, approvalStatus: 'approved' },
+      { name: 'Gokul Staff', email: 'gokul.cashier@campusbite.com', password: await makeHash('Cashier@123'), role: 'cashier', shift: 'Morning', active: true, approvalStatus: 'approved' },
+
+      // 3. Kitchen Head Chef
+      { name: 'Chef Anthony', email: 'kitchen@campusbite.com', password: await makeHash('Kitchen@123'), role: 'kitchen', shift: 'All-Day', active: true, approvalStatus: 'approved' },
+      { name: 'Anthony Kitchen', email: 'anthony.kitchen@campusbite.com', password: await makeHash('Kitchen@123'), role: 'kitchen', shift: 'All-Day', active: true, approvalStatus: 'approved' },
+
+      // 4. Juice Bar Specialist
+      { name: 'Ravi (Beverage)', email: 'juice@campusbite.com', password: await makeHash('Juice@123'), role: 'beverage', shift: 'Morning', active: true, approvalStatus: 'approved' },
+      { name: 'Ravi Specialist', email: 'ravi.juice@campusbite.com', password: await makeHash('Juice@123'), role: 'beverage', shift: 'Morning', active: true, approvalStatus: 'approved' },
+
+      // 5. Order Handover Counter
+      { name: 'Divya (Counter)', email: 'counter@campusbite.com', password: await makeHash('Counter@123'), role: 'counter', shift: 'Evening', active: true, approvalStatus: 'approved' },
+      { name: 'Divya Handover', email: 'divya.counter@campusbite.com', password: await makeHash('Counter@123'), role: 'counter', shift: 'Evening', active: true, approvalStatus: 'approved' },
+
+      // 6. Registered Student
+      { name: 'Krithik (Student)', email: 'student@campusbite.com', password: await makeHash('Student@123'), role: 'student', studentId: 'CB-2026-STU', loyaltyPoints: 240, active: true, approvalStatus: 'approved' },
+      { name: 'Krithik Diner', email: 'krithik.student@campusbite.com', password: await makeHash('Student@123'), role: 'student', studentId: 'CB-2026-99', loyaltyPoints: 120, active: true, approvalStatus: 'approved' },
+
+      // 7. Pending Staff Account (Requires Manager Approval)
+      { name: 'Priya (New Applicant)', email: 'newstaff@campusbite.com', password: await makeHash('Staff@123'), role: 'cashier', shift: 'Evening', active: false, approvalStatus: 'pending' }
     ];
     await User.insertMany(staffUsers);
-    console.log(`✅ Inserted ${staffUsers.length} users into Atlas!`);
+    console.log(`✅ Inserted ${staffUsers.length} encrypted users into Atlas!`);
 
     // 3. Seed Initial Inventory
     console.log('Seeding inventory records...');
