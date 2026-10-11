@@ -32,13 +32,14 @@ export default function StudentHome() {
 
   const categories = [
     'All',
-    'Today Special',
     'Main Course',
+    'Today Special',
     'Curries',
+    'Bakes & Snacks',
+    'Sweets & Puddings',
     'Hot Drinks',
-    'Chocolates',
-    'Ice Creams',
-    'Desserts'
+    'Juices & Milkshakes',
+    'Ice Creams'
   ];
 
   const filteredItems = useMemo(() => {

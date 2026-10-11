@@ -19,9 +19,9 @@ export const StoreProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : initialOrders;
   });
 
-  // Menu items
+  // Menu items (75 authentic cafeteria items)
   const [menu, setMenu] = useState(() => {
-    const saved = localStorage.getItem('cb_menu');
+    const saved = localStorage.getItem('cb_menu_canteen_v3');
     return saved ? JSON.parse(saved) : initialMenuItems;
   });
 
@@ -103,7 +103,7 @@ export const StoreProvider = ({ children }) => {
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('cb_menu', JSON.stringify(menu));
+    localStorage.setItem('cb_menu_canteen_v3', JSON.stringify(menu));
   }, [menu]);
 
   useEffect(() => {
