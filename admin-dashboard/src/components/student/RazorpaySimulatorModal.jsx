@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, CheckCircle2, AlertCircle, ShieldCheck, CreditCard, Smartphone, Building, Loader2 } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, ShieldCheck, CreditCard, Smartphone, Building, Loader2, QrCode } from 'lucide-react';
+import QRCodeView from '../common/QRCodeView';
 
 export default function RazorpaySimulatorModal({ amount, onSuccess, onFailure, onClose }) {
   const [selectedMethod, setSelectedMethod] = useState('upi');
@@ -140,14 +141,42 @@ export default function RazorpaySimulatorModal({ amount, onSuccess, onFailure, o
             </div>
 
             {selectedMethod === 'upi' && (
-              <div className="space-y-3">
+              <div className="space-y-4">
+                {/* Dynamic UPI Payment QR Code */}
+                <div className="flex flex-col items-center p-3 rounded-xl bg-surface-2 border border-line">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-fg-muted mb-2 flex items-center gap-1.5">
+                    <QrCode size={13} className="text-accent" />
+                    <span>Scan with Any UPI App to Pay ₹{amount}</span>
+                  </span>
+
+                  <QRCodeView
+                    value={`upi://pay?pa=campusbite@okcanteen&pn=CampusBite%20Cafeteria&am=${amount}&cu=INR&tn=CampusBite%20Order`}
+                    size={135}
+                    caption="GPay • PhonePe • Paytm • BHIM"
+                    showActions={false}
+                  />
+
+                  <div className="mt-2 text-center text-[11px] text-fg-muted">
+                    Point your camera or UPI scanner at the QR code above
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="h-px bg-line flex-1" />
+                  <span className="text-[11px] uppercase tracking-wider text-fg-muted font-medium">Or pay with UPI ID</span>
+                  <div className="h-px bg-line flex-1" />
+                </div>
+
                 <div className="grid grid-cols-3 gap-2">
                   {['Google Pay', 'PhonePe', 'Paytm'].map((app) => (
                     <button
                       key={app}
                       type="button"
-                      onClick={() => setSelectedUpiApp(app.toLowerCase())}
-                      className={`p-2.5 text-center rounded border text-[12.5px] font-medium transition-colors ${
+                      onClick={() => {
+                        setSelectedUpiApp(app.toLowerCase());
+                        setUpiId(`student@ok${app.toLowerCase().slice(0, 3)}`);
+                      }}
+                      className={`p-2 text-center rounded border text-[11.5px] font-medium transition-colors ${
                         selectedUpiApp === app.toLowerCase()
                           ? 'border-accent bg-accent-soft text-accent'
                           : 'border-line bg-surface hover:bg-surface-2 text-fg'
@@ -157,8 +186,9 @@ export default function RazorpaySimulatorModal({ amount, onSuccess, onFailure, o
                     </button>
                   ))}
                 </div>
+
                 <div>
-                  <label htmlFor="upi-vpa" className="label">
+                  <label htmlFor="upi-vpa" className="label text-xs">
                     UPI ID / VPA
                   </label>
                   <input
@@ -166,7 +196,7 @@ export default function RazorpaySimulatorModal({ amount, onSuccess, onFailure, o
                     type="text"
                     value={upiId}
                     onChange={(e) => setUpiId(e.target.value)}
-                    className="input text-[13px]"
+                    className="input text-[12.5px] py-2"
                   />
                 </div>
               </div>

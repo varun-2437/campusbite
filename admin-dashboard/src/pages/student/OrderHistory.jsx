@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { PageHeader, StatusBadge, EmptyState } from '../../theme/ui';
+import QRCodeView from '../../components/common/QRCodeView';
 import {
   Clock,
   RotateCcw,
   Calendar,
   UtensilsCrossed,
-  ArrowRight
+  ArrowRight,
+  QrCode,
+  X
 } from 'lucide-react';
 
 export default function OrderHistory() {
@@ -20,6 +23,7 @@ export default function OrderHistory() {
   const navigate = useNavigate();
 
   const [filterStatus, setFilterStatus] = useState('All');
+  const [qrModalOrder, setQrModalOrder] = useState(null);
 
   const historyList = (studentOrderHistory.length > 0 ? studentOrderHistory : orders);
 
@@ -140,25 +144,35 @@ export default function OrderHistory() {
                         ₹{order.totalAmount}
                       </td>
                       <td className="text-right">
-                        {isActive ? (
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
-                            onClick={() => handleTrack(order)}
-                            className="btn-primary btn-sm"
+                            onClick={() => setQrModalOrder(order)}
+                            className="btn-ghost btn-sm p-1.5 border border-line hover:border-accent hover:text-accent"
+                            title="View Pickup QR Pass"
                           >
-                            <span>Track</span>
-                            <ArrowRight size={13} strokeWidth={1.75} />
+                            <QrCode size={14} />
                           </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleReorder(order)}
-                            className="btn-secondary btn-sm"
-                          >
-                            <RotateCcw size={13} strokeWidth={1.75} />
-                            <span>Reorder</span>
-                          </button>
-                        )}
+                          {isActive ? (
+                            <button
+                              type="button"
+                              onClick={() => handleTrack(order)}
+                              className="btn-primary btn-sm"
+                            >
+                              <span>Track</span>
+                              <ArrowRight size={13} strokeWidth={1.75} />
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleReorder(order)}
+                              className="btn-secondary btn-sm"
+                            >
+                              <RotateCcw size={13} strokeWidth={1.75} />
+                              <span>Reorder</span>
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -195,28 +209,88 @@ export default function OrderHistory() {
                     <span className="text-[16px] font-semibold text-fg tabular-nums">
                       ₹{order.totalAmount}
                     </span>
-                    {isActive ? (
+                    <div className="flex items-center gap-1.5">
                       <button
                         type="button"
-                        onClick={() => handleTrack(order)}
-                        className="btn-primary btn-sm"
+                        onClick={() => setQrModalOrder(order)}
+                        className="btn-ghost btn-sm p-1.5 border border-line"
+                        title="View Pickup QR Pass"
                       >
-                        Track Stepper
+                        <QrCode size={14} />
                       </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleReorder(order)}
-                        className="btn-secondary btn-sm"
-                      >
-                        <RotateCcw size={13} strokeWidth={1.75} />
-                        <span>Reorder</span>
-                      </button>
-                    )}
+                      {isActive ? (
+                        <button
+                          type="button"
+                          onClick={() => handleTrack(order)}
+                          className="btn-primary btn-sm"
+                        >
+                          Track Stepper
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleReorder(order)}
+                          className="btn-secondary btn-sm"
+                        >
+                          <RotateCcw size={13} strokeWidth={1.75} />
+                          <span>Reorder</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* QR Pass Inspection Modal */}
+      {qrModalOrder && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setQrModalOrder(null)}
+        >
+          <div
+            className="w-full max-w-sm bg-surface border border-line rounded-2xl p-6 shadow-pop text-center space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <div className="text-left">
+                <h3 className="text-sm font-bold text-fg">Digital Pickup Token</h3>
+                <p className="text-[11px] text-fg-muted">{qrModalOrder.orderId}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQrModalOrder(null)}
+                className="w-7 h-7 rounded-lg hover:bg-surface-2 flex items-center justify-center text-fg-muted hover:text-fg"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <QRCodeView
+              value={`CAMPUSBITE:${qrModalOrder.orderId}:${qrModalOrder.tokenNumber}`}
+              tokenNumber={qrModalOrder.tokenNumber}
+              size={160}
+              caption="Present this QR code to counter staff when called"
+              status={qrModalOrder.status}
+            />
+
+            <div className="p-3 bg-surface-2 border border-line rounded-xl text-left text-xs space-y-1">
+              <div className="flex justify-between text-fg">
+                <span className="text-fg-muted">Items:</span>
+                <span className="font-semibold">{qrModalOrder.items?.length || 0} items</span>
+              </div>
+              <div className="flex justify-between text-fg">
+                <span className="text-fg-muted">Amount:</span>
+                <span className="font-semibold text-accent">₹{qrModalOrder.totalAmount}</span>
+              </div>
+              <div className="flex justify-between text-fg">
+                <span className="text-fg-muted">Payment:</span>
+                <span className="capitalize">{qrModalOrder.paymentMethod}</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

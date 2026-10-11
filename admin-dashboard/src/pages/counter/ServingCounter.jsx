@@ -27,10 +27,16 @@ export default function ServingCounter() {
   const preparingOrders = orders.filter((o) => o.status === 'Preparing');
 
   const handleHandover = (tokenOrOrderId) => {
+    const raw = (tokenOrOrderId || '').trim().toUpperCase();
+    const tokenMatch = raw.match(/TK-\d+/) || raw.match(/ORD-\d+/);
+    const query = tokenMatch ? tokenMatch[0] : raw;
+
     const target = orders.find(
       (o) =>
-        (o.tokenNumber.toUpperCase() === tokenOrOrderId.trim().toUpperCase() ||
-          o.orderId.toUpperCase() === tokenOrOrderId.trim().toUpperCase()) &&
+        (o.tokenNumber.toUpperCase() === query ||
+          o.orderId.toUpperCase() === query ||
+          raw.includes(o.tokenNumber.toUpperCase()) ||
+          raw.includes(o.orderId.toUpperCase())) &&
         o.status === 'Ready'
     );
 

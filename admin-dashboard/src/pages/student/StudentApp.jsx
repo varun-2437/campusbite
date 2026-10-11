@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency } from '../../utils/formatters';
+import QRCodeView from '../../components/common/QRCodeView';
 import {
   Home,
   UtensilsCrossed,
@@ -619,6 +620,17 @@ export default function StudentApp() {
                       {i.name} (x{i.quantity})
                     </span>
                   ))}
+                </div>
+
+                {/* Dynamic Scannable QR Pass */}
+                <div style={{ margin: '1rem 0', display: 'flex', justifyContent: 'center' }}>
+                  <QRCodeView
+                    value={`CAMPUSBITE:${activeOrders[0].orderId}:${activeOrders[0].tokenNumber}`}
+                    tokenNumber={activeOrders[0].tokenNumber}
+                    size={140}
+                    caption="Show at pickup counter for meal handover"
+                    status={activeOrders[0].status}
+                  />
                 </div>
 
                 {/* Simulation status advance button */}

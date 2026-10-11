@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
 import FeedbackModal from '../../components/student/FeedbackModal';
+import QRCodeView from '../../components/common/QRCodeView';
 import { PageHeader, StatusBadge, EmptyState } from '../../theme/ui';
 import {
   CheckCircle2,
@@ -276,37 +277,15 @@ export default function OrderTracking() {
               </span>
             </div>
 
-            {/* High-contrast QR Pass */}
-            <div className="flex flex-col items-center py-2">
-              <div className="p-3 bg-white rounded-lg border border-line-strong inline-block">
-                <svg
-                  width="140"
-                  height="140"
-                  viewBox="0 0 100 100"
-                  aria-label={`QR Code for Token ${activeOrder.tokenNumber}`}
-                >
-                  <rect width="100" height="100" fill="#ffffff" />
-                  <rect x="8" y="8" width="24" height="24" fill="#000" />
-                  <rect x="12" y="12" width="16" height="16" fill="#fff" />
-                  <rect x="16" y="16" width="8" height="8" fill="#000" />
-                  <rect x="68" y="8" width="24" height="24" fill="#000" />
-                  <rect x="72" y="12" width="16" height="16" fill="#fff" />
-                  <rect x="76" y="16" width="8" height="8" fill="#000" />
-                  <rect x="8" y="68" width="24" height="24" fill="#000" />
-                  <rect x="12" y="72" width="16" height="16" fill="#fff" />
-                  <rect x="16" y="76" width="8" height="8" fill="#000" />
-                  <rect x="42" y="12" width="8" height="8" fill="#000" />
-                  <rect x="54" y="12" width="6" height="6" fill="#000" />
-                  <rect x="42" y="42" width="16" height="16" fill="#000" />
-                  <rect x="66" y="42" width="8" height="8" fill="#000" />
-                  <rect x="42" y="68" width="8" height="8" fill="#000" />
-                  <rect x="56" y="68" width="8" height="8" fill="#000" />
-                  <rect x="70" y="68" width="16" height="6" fill="#000" />
-                </svg>
-              </div>
-              <span className="text-[12px] text-fg-muted mt-2">
-                Staff scans QR at Serving Counter
-              </span>
+            {/* High-contrast Dynamic QR Pass */}
+            <div className="py-2">
+              <QRCodeView
+                value={`CAMPUSBITE:${activeOrder.orderId}:${activeOrder.tokenNumber}`}
+                tokenNumber={activeOrder.tokenNumber}
+                size={148}
+                caption="Staff scans QR at Serving Counter"
+                status={activeOrder.status}
+              />
             </div>
 
             <div className="text-left text-[12px] text-fg-muted bg-surface-2 p-3 rounded-md space-y-1.5 border border-line">

@@ -519,13 +519,17 @@ export const StoreProvider = ({ children }) => {
   };
 
   const verifyCashPayment = (tokenIdOrOrderId) => {
-    const trimmed = tokenIdOrOrderId.trim().toUpperCase();
+    const raw = (tokenIdOrOrderId || '').trim().toUpperCase();
+    const tokenMatch = raw.match(/TK-\d+/) || raw.match(/ORD-\d+/);
+    const trimmed = tokenMatch ? tokenMatch[0] : raw;
     let found = false;
     setOrders((prev) =>
       prev.map((ord) => {
         if (
           ord.orderId.toUpperCase() === trimmed ||
-          ord.tokenNumber.toUpperCase() === trimmed
+          ord.tokenNumber.toUpperCase() === trimmed ||
+          raw.includes(ord.orderId.toUpperCase()) ||
+          raw.includes(ord.tokenNumber.toUpperCase())
         ) {
           found = true;
           return { ...ord, paymentStatus: 'Paid' };
