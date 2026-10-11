@@ -19,8 +19,12 @@ const menuItemSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ['Food', 'Beverage', 'Snacks', 'Desserts', 'Breakfast', 'Lunch'],
-      default: 'Food'
+      required: true,
+      default: 'Main Course'
+    },
+    description: {
+      type: String,
+      default: ''
     },
     isAvailable: {
       type: Boolean,
