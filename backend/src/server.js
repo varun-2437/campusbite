@@ -43,6 +43,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/order', orderRoutes);
+app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/token', tokenRoutes);
 app.use('/api/inventory', inventoryRoutes);
