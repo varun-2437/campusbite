@@ -47,10 +47,17 @@ class ApiClient {
   }
 
   // --- Auth APIs ---
-  async login(email, password, role) {
+  async login(email, password) {
     return this.request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password, role })
+      body: JSON.stringify({ email, password })
+    });
+  }
+
+  async register(userData) {
+    return this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData)
     });
   }
 
@@ -145,6 +152,24 @@ class ApiClient {
     return this.request('/staff', {
       method: 'POST',
       body: JSON.stringify(staffData)
+    });
+  }
+
+  async approveStaff(staffId) {
+    return this.request(`/staff/${staffId}/approve`, {
+      method: 'PUT'
+    });
+  }
+
+  async rejectStaff(staffId) {
+    return this.request(`/staff/${staffId}/reject`, {
+      method: 'PUT'
+    });
+  }
+
+  async toggleStaffStatus(staffId) {
+    return this.request(`/staff/${staffId}/status`, {
+      method: 'PUT'
     });
   }
 
