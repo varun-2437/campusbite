@@ -22,9 +22,12 @@ export const StoreProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : initialOrders;
   });
 
-  // Menu items (75 authentic cafeteria items)
+  // Menu items (75 authentic cafeteria items with 100% unique images)
   const [menu, setMenu] = useState(() => {
-    const saved = localStorage.getItem('cb_menu_canteen_v3');
+    try {
+      localStorage.removeItem('cb_menu_canteen_v3');
+    } catch {}
+    const saved = localStorage.getItem('cb_menu_canteen_v4');
     return saved ? JSON.parse(saved) : initialMenuItems;
   });
 
@@ -147,7 +150,7 @@ export const StoreProvider = ({ children }) => {
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('cb_menu_canteen_v3', JSON.stringify(menu));
+    localStorage.setItem('cb_menu_canteen_v4', JSON.stringify(menu));
   }, [menu]);
 
   useEffect(() => {
