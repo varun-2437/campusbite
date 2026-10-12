@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { X, Star, CheckCircle2, Award } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
   const { submitFeedback, studentUser } = useStore();
+  const { user, isGuest } = useAuth();
+  const isStudent = !isGuest && user?.role === 'student';
 
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
@@ -80,7 +83,9 @@ export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
                 Feedback Recorded
               </h3>
               <p className="text-[13px] text-fg-muted mt-1">
-                Your rating has been submitted to the canteen manager. 15 loyalty points have been credited to your account.
+                {isStudent
+                  ? 'Your rating has been submitted to the canteen manager. 15 loyalty points have been credited to your account.'
+                  : 'Your rating has been submitted to the canteen manager. Thank you for your feedback!'}
               </p>
             </div>
             <button
@@ -174,7 +179,7 @@ export default function FeedbackModal({ orderId, tokenNumber, onClose }) {
               onClick={handleSubmit}
               className="btn-primary w-full h-9 text-[13px]"
             >
-              <span>Submit Feedback (+15 pts)</span>
+              <span>{isStudent ? 'Submit Feedback (+15 pts)' : 'Submit Feedback'}</span>
             </button>
           </div>
         )}

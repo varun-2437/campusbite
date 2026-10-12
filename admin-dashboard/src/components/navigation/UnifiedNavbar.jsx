@@ -269,12 +269,14 @@ export default function UnifiedNavbar({ onToggleMobileMenu }) {
               >
                 History
               </NavLink>
-              <NavLink
-                to="/loyalty"
-                className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}
-              >
-                Rewards
-              </NavLink>
+              {!isGuest && user?.role === 'student' && (
+                <NavLink
+                  to="/loyalty"
+                  className={({ isActive }) => `nav-link ${isActive ? 'nav-link-active' : ''}`}
+                >
+                  Rewards
+                </NavLink>
+              )}
             </nav>
           )}
 

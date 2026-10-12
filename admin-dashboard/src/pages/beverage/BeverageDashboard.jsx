@@ -84,7 +84,7 @@ export default function BeverageDashboard() {
                   {order.status === 'Pending' ? (
                     <button
                       onClick={() => updateOrderStatus(order.orderId, 'Preparing')}
-                      style={styles.prepBtn}
+                      className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs rounded-lg shadow-sm flex items-center justify-center gap-2 transition cursor-pointer"
                     >
                       <Flame size={16} />
                       <span>Start Blending/Pouring</span>
@@ -92,7 +92,7 @@ export default function BeverageDashboard() {
                   ) : (
                     <button
                       onClick={() => updateOrderStatus(order.orderId, 'Ready')}
-                      style={styles.readyBtn}
+                      className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-xs rounded-lg shadow-sm flex items-center justify-center gap-2 transition cursor-pointer"
                     >
                       <CheckCircle2 size={16} />
                       <span>Mark Ready for Pickup</span>

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
+import { useAuth } from '../../context/AuthContext';
 import ItemCustomizationModal from '../../components/student/ItemCustomizationModal';
 import { PageHeader, StatusBadge, EmptyState } from '../../theme/ui';
 import {
@@ -22,7 +23,10 @@ export default function StudentHome() {
     currentActiveStudentOrder,
     studentUser
   } = useStore();
+  const { user, isGuest } = useAuth();
   const navigate = useNavigate();
+
+  const isStudent = !isGuest && user?.role === 'student';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -116,11 +120,17 @@ export default function StudentHome() {
       {/* Page Header (Left-aligned, 22px / 600, no emojis) */}
       <PageHeader
         title="Campus Canteen Menu"
-        subtitle={`Welcome, ${studentUser.isGuest ? 'Guest Diner' : studentUser.name}. Order ahead and pick up from the counter.`}
+        subtitle={
+          isStudent
+            ? `Welcome, ${user?.name || studentUser.name}. Order ahead and pick up from the counter.`
+            : 'Welcome to CampusBite. Browse the menu, order ahead, and pick up from the counter.'
+        }
         actions={
-          <div className="text-[12.5px] text-fg-muted font-medium bg-surface-2 px-3 py-1.5 rounded-md border border-line">
-            Loyalty: <span className="text-fg font-semibold tabular-nums">{studentUser.loyaltyPoints}</span> pts
-          </div>
+          isStudent ? (
+            <div className="text-[12.5px] text-fg-muted font-medium bg-surface-2 px-3 py-1.5 rounded-md border border-line">
+              Loyalty: <span className="text-fg font-semibold tabular-nums">{user?.loyaltyPoints ?? studentUser.loyaltyPoints ?? 0}</span> pts
+            </div>
+          ) : null
         }
       />
 

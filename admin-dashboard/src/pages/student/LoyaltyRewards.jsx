@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
+import { useAuth } from '../../context/AuthContext';
 import { PageHeader, StatCard } from '../../theme/ui';
 import {
   Award,
@@ -7,14 +9,111 @@ import {
   CheckCircle2,
   Zap,
   TrendingUp,
-  Tag
+  Tag,
+  Lock,
+  ArrowRight,
+  ShieldAlert,
+  LogIn
 } from 'lucide-react';
 
 export default function LoyaltyRewards() {
   const { studentUser, redeemReward } = useStore();
+  const { user, isGuest, openAuthModal } = useAuth();
+  const navigate = useNavigate();
   const [redeemToast, setRedeemToast] = useState(null);
 
-  const points = studentUser.loyaltyPoints || 0;
+  // GUEST GATE: Unauthenticated visitors must sign in as student
+  if (isGuest) {
+    return (
+      <div className="py-12 px-4 max-w-lg mx-auto animate-in fade-in duration-200">
+        <div className="card text-center p-8 space-y-4 border border-line">
+          <div className="w-14 h-14 rounded-full bg-accent-soft border border-line flex items-center justify-center mx-auto text-accent">
+            <Gift size={26} strokeWidth={1.75} />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-[18px] font-semibold text-fg">Student Login Required</h2>
+            <p className="text-[13px] text-fg-muted leading-relaxed">
+              The CampusBite Rewards program is reserved for logged-in students. Sign in with your student account to earn points on every canteen order and redeem discount vouchers.
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row gap-2.5 justify-center">
+            <button
+              type="button"
+              onClick={openAuthModal}
+              className="btn-primary h-9 px-4 text-[13px] font-semibold gap-1.5"
+            >
+              <LogIn size={14} strokeWidth={1.75} />
+              <span>Sign In as Student</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="btn-secondary h-9 px-4 text-[13px] font-semibold"
+            >
+              Browse Canteen Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // STAFF GATE: Staff accounts (cashier, kitchen, beverage, counter, manager) are redirected to their work dashboards
+  if (user?.role !== 'student') {
+    const roleTitle = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Staff';
+    const getDashboardPath = (role) => {
+      switch (role) {
+        case 'cashier':
+          return '/cashier';
+        case 'kitchen':
+          return '/kitchen';
+        case 'beverage':
+          return '/beverage';
+        case 'counter':
+          return '/counter';
+        case 'manager':
+          return '/manager/reports';
+        default:
+          return '/';
+      }
+    };
+
+    return (
+      <div className="py-12 px-4 max-w-lg mx-auto animate-in fade-in duration-200">
+        <div className="card text-center p-8 space-y-4 border border-line">
+          <div className="w-14 h-14 rounded-full bg-accent-soft border border-line flex items-center justify-center mx-auto text-accent">
+            <ShieldAlert size={26} strokeWidth={1.75} />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-[18px] font-semibold text-fg">Student Loyalty Program</h2>
+            <p className="text-[13px] text-fg-muted leading-relaxed">
+              Canteen rewards and discount vouchers are only available for student diners. You are currently logged in with a <strong className="text-fg">{roleTitle}</strong> account.
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row gap-2.5 justify-center">
+            <button
+              type="button"
+              onClick={() => navigate(getDashboardPath(user?.role))}
+              className="btn-primary h-9 px-4 text-[13px] font-semibold gap-1.5"
+            >
+              <span>Go to {roleTitle} Dashboard</span>
+              <ArrowRight size={14} strokeWidth={1.75} />
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="btn-secondary h-9 px-4 text-[13px] font-semibold"
+            >
+              Return to Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // LOGGED-IN STUDENT VIEW
+  const points = user?.loyaltyPoints ?? studentUser.loyaltyPoints ?? 0;
 
   const getTier = () => {
     if (points >= 300) return { name: 'Gold Tier', progress: 100, nextTier: 'Max Tier reached' };

@@ -24,6 +24,18 @@
     --warning: 217 119 6;
     --danger: 220 38 38;
     --info: 37 99 235;
+
+    /* Backward compatibility mappings for legacy styles */
+    --accent-primary: rgb(var(--accent));
+    --accent-secondary: rgb(var(--accent-hover));
+    --accent-success: rgb(var(--success));
+    --bg-primary: rgb(var(--canvas));
+    --bg-secondary: rgb(var(--surface));
+    --bg-hover: rgb(var(--surface-2));
+    --border-color: rgb(var(--line));
+    --text-primary: rgb(var(--fg));
+    --text-secondary: rgb(var(--fg-muted));
+    --text-muted: rgb(var(--fg-subtle));
   }
 
   .dark {
@@ -47,6 +59,18 @@
     --warning: 251 191 36;
     --danger: 248 113 113;
     --info: 96 165 250;
+
+    /* Backward compatibility mappings for legacy styles */
+    --accent-primary: rgb(var(--accent));
+    --accent-secondary: rgb(var(--accent-hover));
+    --accent-success: rgb(var(--success));
+    --bg-primary: rgb(var(--canvas));
+    --bg-secondary: rgb(var(--surface));
+    --bg-hover: rgb(var(--surface-2));
+    --border-color: rgb(var(--line));
+    --text-primary: rgb(var(--fg));
+    --text-secondary: rgb(var(--fg-muted));
+    --text-muted: rgb(var(--fg-subtle));
   }
 
   * {

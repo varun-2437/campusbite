@@ -36,90 +36,122 @@ export default function KitchenDashboard() {
   };
 
   return (
-    <div>
-      <div style={styles.header}>
+    <div className="space-y-6">
+      {/* Header & Filter Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 style={styles.pageTitle}>Kitchen Display System (KDS)</h1>
-          <p style={styles.pageSubtitle}>
+          <h1 className="text-2xl font-bold tracking-tight text-fg">Kitchen Display System (KDS)</h1>
+          <p className="text-sm text-fg-muted">
             Live food queue feed • Real-time order progress & ticket management
           </p>
         </div>
 
-        <div style={styles.filterBar}>
-          <Filter size={16} color="var(--text-secondary)" />
+        <div className="flex items-center gap-1.5 bg-surface border border-line rounded-lg p-1 shadow-sm">
+          <div className="pl-2 pr-1 text-fg-muted">
+            <Filter size={15} />
+          </div>
           <button
             onClick={() => setFilterPriority('ALL')}
-            style={{ ...styles.filterBtn, ...(filterPriority === 'ALL' ? styles.filterBtnActive : {}) }}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer ${
+              filterPriority === 'ALL'
+                ? 'bg-accent text-white font-semibold shadow-sm'
+                : 'text-fg-muted hover:text-fg hover:bg-surface-2'
+            }`}
           >
             All Tickets ({foodOrders.length})
           </button>
           <button
             onClick={() => setFilterPriority('VIP')}
-            style={{ ...styles.filterBtn, ...(filterPriority === 'VIP' ? styles.filterBtnActive : {}) }}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer ${
+              filterPriority === 'VIP'
+                ? 'bg-accent text-white font-semibold shadow-sm'
+                : 'text-fg-muted hover:text-fg hover:bg-surface-2'
+            }`}
           >
             VIP
           </button>
           <button
             onClick={() => setFilterPriority('Quick')}
-            style={{ ...styles.filterBtn, ...(filterPriority === 'Quick' ? styles.filterBtnActive : {}) }}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer ${
+              filterPriority === 'Quick'
+                ? 'bg-accent text-white font-semibold shadow-sm'
+                : 'text-fg-muted hover:text-fg hover:bg-surface-2'
+            }`}
           >
             Quick Snack
           </button>
           <button
             onClick={() => setFilterPriority('Bulk')}
-            style={{ ...styles.filterBtn, ...(filterPriority === 'Bulk' ? styles.filterBtnActive : {}) }}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer ${
+              filterPriority === 'Bulk'
+                ? 'bg-accent text-white font-semibold shadow-sm'
+                : 'text-fg-muted hover:text-fg hover:bg-surface-2'
+            }`}
           >
             Bulk
           </button>
         </div>
       </div>
 
+      {/* Ticket Grid or Empty State */}
       {foodOrders.length === 0 ? (
-        <div style={styles.emptyState}>
-          <ChefHat size={56} color="var(--text-muted)" />
-          <h3>All Food Orders Completed!</h3>
-          <p>No pending food tickets right now. Waiting for new orders from app & cashier.</p>
+        <div className="card text-center py-16 flex flex-col items-center justify-center gap-3 border-dashed border-2">
+          <div className="p-3 bg-surface-2 rounded-full text-fg-subtle">
+            <ChefHat size={48} />
+          </div>
+          <h3 className="text-lg font-semibold text-fg">All Food Orders Completed!</h3>
+          <p className="text-sm text-fg-muted max-w-md">
+            No pending food tickets right now. Waiting for incoming orders from the student portal and cashier POS.
+          </p>
         </div>
       ) : (
-        <div style={styles.ticketsGrid}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {foodOrders.map((order) => {
             const elapsed = getElapsedMinutes(order.createdAt);
-            const pStyle = getPriorityStyle(order.priority);
             const isLate = elapsed > 15;
+            const isPreparing = order.status === 'Preparing';
 
             return (
               <div
                 key={order.orderId}
-                style={{
-                  ...styles.ticketCard,
-                  borderColor: isLate ? '#ef4444' : order.status === 'Preparing' ? 'var(--accent-primary)' : 'var(--border-color)'
-                }}
+                className={`bg-surface rounded-xl p-5 border flex flex-col justify-between shadow-sm transition hover:shadow-md ${
+                  isLate
+                    ? 'border-red-500/80 ring-1 ring-red-500/30'
+                    : isPreparing
+                    ? 'border-teal-500/80 ring-1 ring-teal-500/30'
+                    : 'border-line hover:border-line-strong'
+                }`}
+                style={{ minHeight: '290px' }}
               >
                 {/* Header with Token & Timer */}
-                <div style={styles.ticketHeader}>
+                <div className="border-b border-line pb-3.5 mb-3.5 flex items-start justify-between">
                   <div>
-                    <div style={styles.tokenTag}>{order.tokenNumber}</div>
-                    <span style={styles.orderIdText}>{order.orderId}</span>
+                    <div className="text-2xl font-black text-fg tracking-tight">{order.tokenNumber}</div>
+                    <span className="text-xs font-mono text-fg-muted">{order.orderId}</span>
                   </div>
 
-                  <div style={{ textAlign: 'right' }}>
+                  <div className="flex flex-col items-end gap-1.5">
                     <div
-                      style={{
-                        ...styles.timerBadge,
-                        backgroundColor: isLate ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                        color: isLate ? '#ef4444' : 'var(--text-secondary)'
-                      }}
+                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                        isLate
+                          ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800'
+                          : 'bg-surface-2 text-fg-muted border-line'
+                      }`}
                     >
-                      <Clock size={14} />
+                      <Clock size={12} />
                       <span>{elapsed}m ago</span>
                     </div>
+
                     <span
-                      style={{
-                        ...styles.priorityTag,
-                        backgroundColor: pStyle.bg,
-                        color: pStyle.text,
-                        borderColor: pStyle.border
-                      }}
+                      className={`text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
+                        order.priority === 'VIP'
+                          ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-950/40 dark:text-red-400'
+                          : order.priority === 'Quick'
+                          ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400'
+                          : order.priority === 'Bulk'
+                          ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400'
+                          : 'bg-surface-2 text-fg-muted border-line'
+                      }`}
                     >
                       {order.priority}
                     </span>
@@ -127,16 +159,20 @@ export default function KitchenDashboard() {
                 </div>
 
                 {/* Items List */}
-                <div style={styles.itemsList}>
+                <div className="space-y-2.5 flex-1 mb-4">
                   {order.items
                     .filter((item) => item.category === 'Food')
                     .map((item, idx) => (
-                      <div key={idx} style={styles.itemRow}>
-                        <div style={styles.itemQtyBadge}>{item.quantity}x</div>
-                        <div style={styles.itemDetails}>
-                          <span style={styles.itemTitle}>{item.name}</span>
+                      <div key={idx} className="flex items-start gap-2.5">
+                        <span className="px-2 py-0.5 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 font-bold text-xs rounded border border-teal-200/50">
+                          {item.quantity}x
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-fg leading-snug">{item.name}</p>
                           {item.customization && (
-                            <span style={styles.customizationText}>Note: {item.customization}</span>
+                            <p className="text-xs text-fg-muted italic mt-0.5">
+                              Note: {item.customization}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -145,28 +181,28 @@ export default function KitchenDashboard() {
 
                 {/* Special Instructions */}
                 {order.specialInstructions && (
-                  <div style={styles.instructionsBox}>
-                    <AlertCircle size={14} color="#f59e0b" />
-                    <span>"{order.specialInstructions}"</span>
+                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-300 text-xs mb-3.5">
+                    <AlertCircle size={15} className="shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span className="italic font-medium leading-tight">"{order.specialInstructions}"</span>
                   </div>
                 )}
 
-                {/* Status Transition Action Buttons */}
-                <div style={styles.ticketActions}>
+                {/* Action Buttons - High Contrast and Distinct */}
+                <div className="pt-2 border-t border-line/60">
                   {order.status === 'Pending' ? (
                     <button
                       onClick={() => updateOrderStatus(order.orderId, 'Preparing')}
-                      style={styles.startPrepBtn}
+                      className="w-full py-2.5 px-4 bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-semibold text-sm rounded-lg shadow-sm flex items-center justify-center gap-2 transition cursor-pointer"
                     >
-                      <Flame size={16} />
+                      <Flame size={17} />
                       <span>Start Preparing</span>
                     </button>
                   ) : (
                     <button
                       onClick={() => updateOrderStatus(order.orderId, 'Ready')}
-                      style={styles.markReadyBtn}
+                      className="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-sm rounded-lg shadow-sm flex items-center justify-center gap-2 transition cursor-pointer"
                     >
-                      <CheckCircle2 size={16} />
+                      <CheckCircle2 size={17} />
                       <span>Mark Ready for Pickup</span>
                     </button>
                   )}
@@ -179,182 +215,3 @@ export default function KitchenDashboard() {
     </div>
   );
 }
-
-const styles = {
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '1.5rem',
-    flexWrap: 'wrap',
-    gap: '1rem'
-  },
-  pageTitle: {
-    fontSize: '1.6rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  pageSubtitle: {
-    fontSize: '0.85rem',
-    color: 'var(--text-secondary)'
-  },
-  filterBar: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'var(--bg-secondary)',
-    padding: '4px 8px',
-    borderRadius: '10px',
-    border: '1px solid var(--border-color)'
-  },
-  filterBtn: {
-    padding: '0.4rem 0.8rem',
-    borderRadius: '6px',
-    backgroundColor: 'transparent',
-    color: 'var(--text-secondary)',
-    fontSize: '0.8rem',
-    fontWeight: '500'
-  },
-  filterBtnActive: {
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    fontWeight: '600'
-  },
-  emptyState: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px dashed var(--border-color)',
-    borderRadius: '16px',
-    padding: '4rem 2rem',
-    textAlign: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '0.75rem',
-    color: 'var(--text-secondary)'
-  },
-  ticketsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '1.25rem'
-  },
-  ticketCard: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '2px solid var(--border-color)',
-    borderRadius: '14px',
-    padding: '1.25rem',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    minHeight: '260px'
-  },
-  ticketHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    borderBottom: '1px solid var(--border-color)',
-    paddingBottom: '0.75rem',
-    marginBottom: '0.75rem'
-  },
-  tokenTag: {
-    fontSize: '1.4rem',
-    fontWeight: '800',
-    color: 'var(--text-primary)'
-  },
-  orderIdText: {
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)'
-  },
-  timerBadge: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    fontSize: '0.75rem',
-    padding: '2px 8px',
-    borderRadius: '12px',
-    fontWeight: '600',
-    marginBottom: '4px'
-  },
-  priorityTag: {
-    fontSize: '0.7rem',
-    padding: '2px 8px',
-    borderRadius: '4px',
-    border: '1px solid',
-    fontWeight: '700',
-    display: 'inline-block'
-  },
-  itemsList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.6rem',
-    flex: 1,
-    marginBottom: '1rem'
-  },
-  itemRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.75rem'
-  },
-  itemQtyBadge: {
-    backgroundColor: 'var(--bg-hover)',
-    color: 'var(--accent-primary)',
-    fontWeight: '800',
-    fontSize: '0.9rem',
-    padding: '4px 8px',
-    borderRadius: '6px'
-  },
-  itemDetails: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  itemTitle: {
-    fontSize: '0.95rem',
-    fontWeight: '600',
-    color: 'var(--text-primary)'
-  },
-  customizationText: {
-    fontSize: '0.75rem',
-    color: 'var(--text-secondary)',
-    fontStyle: 'italic'
-  },
-  instructionsBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    border: '1px solid rgba(245, 158, 11, 0.3)',
-    borderRadius: '6px',
-    padding: '0.5rem 0.75rem',
-    fontSize: '0.8rem',
-    color: '#fbbf24',
-    marginBottom: '1rem'
-  },
-  ticketActions: {
-    marginTop: 'auto'
-  },
-  startPrepBtn: {
-    width: '100%',
-    padding: '0.75rem',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    borderRadius: '8px',
-    fontWeight: '700',
-    fontSize: '0.85rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem'
-  },
-  markReadyBtn: {
-    width: '100%',
-    padding: '0.75rem',
-    backgroundColor: 'var(--accent-success)',
-    color: '#fff',
-    borderRadius: '8px',
-    fontWeight: '700',
-    fontSize: '0.85rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem'
-  }
-};

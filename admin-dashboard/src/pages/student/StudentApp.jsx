@@ -75,7 +75,8 @@ export default function StudentApp() {
   const [comment, setComment] = useState('');
 
   const isGuest = !user || user.role === 'guest';
-  const loyaltyPoints = user?.loyaltyPoints || 120;
+  const isStudent = !isGuest && user?.role === 'student';
+  const loyaltyPoints = user?.loyaltyPoints || 0;
 
   // Categories (Authentic Digital Board categories)
   const categories = [
@@ -266,13 +267,15 @@ export default function StudentApp() {
             {/* Header Greeting */}
             <div style={styles.headerRow}>
               <div>
-                <h2 style={styles.greetingTitle}>Hello, {user?.name || 'Student'} 👋</h2>
+                <h2 style={styles.greetingTitle}>Hello, {user?.name || (isGuest ? 'Guest Diner' : 'Student')} 👋</h2>
                 <p style={styles.greetingSubtitle}>What are you craving today?</p>
               </div>
-              <div style={styles.pointsBadge}>
-                <Award size={16} color="#f59e0b" />
-                <span>{loyaltyPoints} Pts</span>
-              </div>
+              {isStudent && (
+                <div style={styles.pointsBadge}>
+                  <Award size={16} color="#f59e0b" />
+                  <span>{loyaltyPoints} Pts</span>
+                </div>
+              )}
             </div>
 
             {/* Pinned Active Order Card (If Any) */}
@@ -699,18 +702,30 @@ export default function StudentApp() {
             </div>
 
             {/* Loyalty Points Card */}
-            <div style={styles.pointsCard}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Award size={22} color="#f59e0b" />
-                <h4 style={{ margin: 0, fontSize: '1rem' }}>CampusBite Rewards</h4>
+            {isStudent ? (
+              <div style={styles.pointsCard}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Award size={22} color="#f59e0b" />
+                  <h4 style={{ margin: 0, fontSize: '1rem' }}>CampusBite Rewards</h4>
+                </div>
+                <h2 style={{ fontSize: '2rem', margin: '0.5rem 0 0.2rem 0', color: '#f59e0b' }}>
+                  {loyaltyPoints} Points
+                </h2>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: '#cbd5e1' }}>
+                  Earn 10 points for every ₹100 spent on cafeteria orders.
+                </p>
               </div>
-              <h2 style={{ fontSize: '2rem', margin: '0.5rem 0 0.2rem 0', color: '#f59e0b' }}>
-                {loyaltyPoints} Points
-              </h2>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: '#cbd5e1' }}>
-                Earn 10 points for every ₹100 spent on cafeteria orders.
-              </p>
-            </div>
+            ) : (
+              <div style={styles.pointsCard}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Award size={22} color="#94a3b8" />
+                  <h4 style={{ margin: 0, fontSize: '1rem' }}>Student Rewards Program</h4>
+                </div>
+                <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.4' }}>
+                  Sign in with a student account to collect 10 points for every ₹100 spent and redeem discount vouchers.
+                </p>
+              </div>
+            )}
 
             {/* Settings Options */}
             <div style={styles.profileOptionsList}>

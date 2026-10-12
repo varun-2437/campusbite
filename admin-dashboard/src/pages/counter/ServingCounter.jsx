@@ -58,26 +58,31 @@ export default function ServingCounter() {
   };
 
   return (
-    <div>
-      <div style={styles.header}>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 style={styles.pageTitle}>Food / Serving Counter</h1>
-          <p style={styles.pageSubtitle}>
+          <h1 className="text-2xl font-bold tracking-tight text-fg">Food / Serving Counter</h1>
+          <p className="text-sm text-fg-muted">
             Validate tokens, hand over prepared meals, and manage the pickup queue
           </p>
         </div>
 
-        <Link to="/now-serving" target="_blank" style={styles.tvLinkBtn}>
+        <Link
+          to="/now-serving"
+          target="_blank"
+          className="inline-flex items-center gap-2 h-9 px-3.5 text-xs font-semibold rounded-lg border border-line bg-surface hover:bg-surface-2 text-accent shadow-sm transition"
+        >
           <Tv size={16} />
           <span>Launch "Now Serving" TV Display</span>
-          <ExternalLink size={14} />
+          <ExternalLink size={13} />
         </Link>
       </div>
 
       {/* Handover Input Card */}
-      <div style={styles.scanCard}>
-        <h3 style={styles.cardHeading}>Scan / Enter Token for Handover</h3>
-        <p style={styles.cardText}>
+      <div className="card bg-surface border border-line rounded-xl p-6 shadow-sm">
+        <h3 className="text-base font-semibold text-fg">Scan / Enter Token for Handover</h3>
+        <p className="text-xs text-fg-muted mt-0.5 mb-4">
           Customer presents token QR or ticket number at pickup counter.
         </p>
 
@@ -86,27 +91,30 @@ export default function ServingCounter() {
             e.preventDefault();
             if (tokenInput) handleHandover(tokenInput);
           }}
-          style={styles.scanForm}
+          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-2xl"
         >
-          <div style={styles.inputWrapper}>
-            <Search size={18} color="var(--text-muted)" style={styles.inputIcon} />
+          <div className="relative flex-1">
+            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fg-muted pointer-events-none" />
             <input
               type="text"
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
               placeholder="Scan QR barcode or enter Token ID (e.g. TK-104)"
-              style={styles.scanInput}
+              className="w-full h-11 pl-10 pr-4 text-sm bg-surface border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-fg placeholder:text-fg-subtle transition shadow-sm"
             />
           </div>
           <button
             type="button"
             onClick={() => setIsScannerOpen(true)}
-            style={styles.scanCameraBtn}
+            className="h-11 px-4 inline-flex items-center justify-center gap-2 text-sm font-semibold rounded-lg border border-line bg-surface hover:bg-surface-2 text-fg transition cursor-pointer shadow-sm shrink-0"
           >
-            <Camera size={18} />
+            <Camera size={18} className="text-fg-muted" />
             <span>Scan QR</span>
           </button>
-          <button type="submit" style={styles.handoverSubmitBtn}>
+          <button
+            type="submit"
+            className="h-11 px-5 inline-flex items-center justify-center gap-2 text-sm font-semibold rounded-lg bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white shadow-sm transition cursor-pointer shrink-0"
+          >
             <PackageCheck size={18} />
             <span>Confirm Handover</span>
           </button>
@@ -124,11 +132,11 @@ export default function ServingCounter() {
 
         {handoverAlert && (
           <div
-            style={
+            className={`mt-4 p-3 rounded-lg border text-xs font-semibold flex items-center gap-2 ${
               handoverAlert.type === 'success'
-                ? styles.alertSuccess
-                : styles.alertError
-            }
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300'
+                : 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
+            }`}
           >
             {handoverAlert.msg}
           </div>
@@ -136,38 +144,58 @@ export default function ServingCounter() {
       </div>
 
       {/* Two-Column Queue Overview */}
-      <div style={styles.queueGrid}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Column 1: Ready for Pickup */}
-        <div style={styles.queueCol}>
-          <div style={styles.colHeaderReady}>
-            <CheckCircle size={18} color="#10b981" />
-            <h3 style={styles.colTitle}>Ready for Handover ({readyOrders.length})</h3>
+        <div className="card p-5 bg-surface border border-line rounded-xl shadow-sm flex flex-col">
+          <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-line">
+            <div className="flex items-center gap-2">
+              <CheckCircle size={18} className="text-emerald-600" />
+              <h3 className="text-base font-semibold text-fg">Ready for Handover</h3>
+            </div>
+            <span className="badge-success text-xs font-semibold">
+              {readyOrders.length} Ready
+            </span>
           </div>
 
-          <div style={styles.ordersList}>
+          <div className="space-y-3 flex-1">
             {readyOrders.length === 0 ? (
-              <div style={styles.emptyColNotice}>No orders currently waiting for pickup.</div>
+              <div className="py-12 text-center text-fg-muted text-xs border border-dashed border-line rounded-lg">
+                No orders currently waiting for pickup.
+              </div>
             ) : (
               readyOrders.map((order) => (
-                <div key={order.orderId} style={styles.orderCardReady}>
-                  <div style={styles.orderTop}>
-                    <span style={styles.tokenHighlight}>{order.tokenNumber}</span>
-                    <span style={styles.customerTag}>{order.customerName}</span>
+                <div
+                  key={order.orderId}
+                  className="border border-line rounded-xl p-4 bg-surface hover:bg-surface-2/40 transition border-l-4 border-l-emerald-500 shadow-sm flex flex-col gap-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl font-black text-emerald-600 tracking-tight">
+                      {order.tokenNumber}
+                    </span>
+                    <span className="text-xs font-medium text-fg-muted bg-surface-2 px-2.5 py-1 rounded-md border border-line">
+                      {order.customerName}
+                    </span>
                   </div>
 
-                  <div style={styles.itemsSummary}>
+                  <div className="flex flex-wrap gap-1.5">
                     {order.items.map((i, idx) => (
-                      <span key={idx} style={styles.itemChip}>
+                      <span
+                        key={idx}
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-surface-2 border border-line text-fg"
+                      >
                         {i.name} (x{i.quantity})
                       </span>
                     ))}
                   </div>
 
-                  <div style={styles.orderBottom}>
-                    <span style={styles.timeTag}>Ready since {formatTime(order.createdAt)}</span>
+                  <div className="flex items-center justify-between pt-1 border-t border-line/60">
+                    <span className="text-xs text-fg-muted flex items-center gap-1">
+                      <Clock size={12} />
+                      Ready since {formatTime(order.createdAt)}
+                    </span>
                     <button
                       onClick={() => handleHandover(order.tokenNumber)}
-                      style={styles.quickHandoverBtn}
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold rounded-md shadow-sm transition cursor-pointer"
                     >
                       Hand Over
                     </button>
@@ -179,34 +207,56 @@ export default function ServingCounter() {
         </div>
 
         {/* Column 2: Currently Preparing */}
-        <div style={styles.queueCol}>
-          <div style={styles.colHeaderPrep}>
-            <Clock size={18} color="#f59e0b" />
-            <h3 style={styles.colTitle}>Currently in Kitchen ({preparingOrders.length})</h3>
+        <div className="card p-5 bg-surface border border-line rounded-xl shadow-sm flex flex-col">
+          <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-line">
+            <div className="flex items-center gap-2">
+              <Clock size={18} className="text-amber-500" />
+              <h3 className="text-base font-semibold text-fg">Currently in Kitchen</h3>
+            </div>
+            <span className="badge-warning text-xs font-semibold">
+              {preparingOrders.length} In Progress
+            </span>
           </div>
 
-          <div style={styles.ordersList}>
+          <div className="space-y-3 flex-1">
             {preparingOrders.length === 0 ? (
-              <div style={styles.emptyColNotice}>No orders in preparation right now.</div>
+              <div className="py-12 text-center text-fg-muted text-xs border border-dashed border-line rounded-lg">
+                No orders in preparation right now.
+              </div>
             ) : (
               preparingOrders.map((order) => (
-                <div key={order.orderId} style={styles.orderCardPrep}>
-                  <div style={styles.orderTop}>
-                    <span style={styles.tokenPrepHighlight}>{order.tokenNumber}</span>
-                    <span style={styles.customerTag}>{order.customerName}</span>
+                <div
+                  key={order.orderId}
+                  className="border border-line rounded-xl p-4 bg-surface hover:bg-surface-2/40 transition border-l-4 border-l-amber-500 shadow-sm flex flex-col gap-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl font-black text-amber-600 tracking-tight">
+                      {order.tokenNumber}
+                    </span>
+                    <span className="text-xs font-medium text-fg-muted bg-surface-2 px-2.5 py-1 rounded-md border border-line">
+                      {order.customerName}
+                    </span>
                   </div>
 
-                  <div style={styles.itemsSummary}>
+                  <div className="flex flex-wrap gap-1.5">
                     {order.items.map((i, idx) => (
-                      <span key={idx} style={styles.itemChip}>
+                      <span
+                        key={idx}
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-surface-2 border border-line text-fg"
+                      >
                         {i.name} (x{i.quantity})
                       </span>
                     ))}
                   </div>
 
-                  <div style={styles.orderBottom}>
-                    <span style={styles.timeTag}>Cooking started {formatTime(order.createdAt)}</span>
-                    <span style={styles.prepStatusPill}>Preparing</span>
+                  <div className="flex items-center justify-between pt-1 border-t border-line/60">
+                    <span className="text-xs text-fg-muted flex items-center gap-1">
+                      <Clock size={12} />
+                      Cooking started {formatTime(order.createdAt)}
+                    </span>
+                    <span className="badge-warning text-xs font-semibold">
+                      Preparing
+                    </span>
                   </div>
                 </div>
               ))
@@ -217,236 +267,3 @@ export default function ServingCounter() {
     </div>
   );
 }
-
-const styles = {
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '1.5rem',
-    flexWrap: 'wrap',
-    gap: '1rem'
-  },
-  pageTitle: {
-    fontSize: '1.6rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  pageSubtitle: {
-    fontSize: '0.85rem',
-    color: 'var(--text-secondary)'
-  },
-  tvLinkBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    color: 'var(--accent-primary)',
-    padding: '0.6rem 1.1rem',
-    borderRadius: '10px',
-    fontSize: '0.85rem',
-    fontWeight: '600'
-  },
-  scanCard: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '16px',
-    padding: '1.5rem',
-    marginBottom: '2rem'
-  },
-  cardHeading: {
-    fontSize: '1.1rem',
-    fontWeight: '600',
-    marginBottom: '0.25rem'
-  },
-  cardText: {
-    fontSize: '0.85rem',
-    color: 'var(--text-secondary)',
-    marginBottom: '1rem'
-  },
-  scanForm: {
-    display: 'flex',
-    gap: '1rem',
-    maxWidth: '650px'
-  },
-  inputWrapper: {
-    position: 'relative',
-    flex: 1
-  },
-  inputIcon: {
-    position: 'absolute',
-    left: '12px',
-    top: '50%',
-    transform: 'translateY(-50%)'
-  },
-  scanInput: {
-    width: '100%',
-    padding: '0.75rem 1rem 0.75rem 2.4rem',
-    borderRadius: '8px',
-    backgroundColor: 'var(--bg-primary)',
-    border: '1px solid var(--border-color)',
-    color: 'var(--text-primary)',
-    fontSize: '0.9rem',
-    outline: 'none',
-    boxSizing: 'border-box'
-  },
-  scanCameraBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'var(--bg-hover)',
-    color: 'var(--text-primary)',
-    padding: '0.75rem 1rem',
-    borderRadius: '8px',
-    fontWeight: '600',
-    fontSize: '0.85rem'
-  },
-  handoverSubmitBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    backgroundColor: 'var(--accent-primary)',
-    color: '#fff',
-    padding: '0.75rem 1.25rem',
-    borderRadius: '8px',
-    fontWeight: '600',
-    fontSize: '0.85rem',
-    whiteSpace: 'nowrap'
-  },
-  alertSuccess: {
-    marginTop: '1rem',
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    color: '#10b981',
-    border: '1px solid rgba(16, 185, 129, 0.3)',
-    borderRadius: '8px',
-    padding: '0.75rem',
-    fontSize: '0.85rem'
-  },
-  alertError: {
-    marginTop: '1rem',
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    color: '#ef4444',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
-    borderRadius: '8px',
-    padding: '0.75rem',
-    fontSize: '0.85rem'
-  },
-  queueGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-    gap: '1.5rem'
-  },
-  queueCol: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '16px',
-    padding: '1.25rem'
-  },
-  colHeaderReady: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    paddingBottom: '0.75rem',
-    borderBottom: '1px solid var(--border-color)',
-    marginBottom: '1rem'
-  },
-  colHeaderPrep: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    paddingBottom: '0.75rem',
-    borderBottom: '1px solid var(--border-color)',
-    marginBottom: '1rem'
-  },
-  colTitle: {
-    fontSize: '1.05rem',
-    fontWeight: '600'
-  },
-  ordersList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem'
-  },
-  emptyColNotice: {
-    padding: '2rem 1rem',
-    textAlign: 'center',
-    color: 'var(--text-muted)',
-    fontSize: '0.85rem'
-  },
-  orderCardReady: {
-    backgroundColor: 'var(--bg-primary)',
-    borderLeft: '4px solid #10b981',
-    borderRadius: '10px',
-    padding: '1rem',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem'
-  },
-  orderCardPrep: {
-    backgroundColor: 'var(--bg-primary)',
-    borderLeft: '4px solid #f59e0b',
-    borderRadius: '10px',
-    padding: '1rem',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem'
-  },
-  orderTop: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  tokenHighlight: {
-    fontSize: '1.25rem',
-    fontWeight: '800',
-    color: '#10b981'
-  },
-  tokenPrepHighlight: {
-    fontSize: '1.25rem',
-    fontWeight: '800',
-    color: '#f59e0b'
-  },
-  customerTag: {
-    fontSize: '0.8rem',
-    color: 'var(--text-secondary)'
-  },
-  itemsSummary: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '0.4rem'
-  },
-  itemChip: {
-    backgroundColor: 'var(--bg-hover)',
-    padding: '3px 8px',
-    borderRadius: '4px',
-    fontSize: '0.75rem',
-    color: 'var(--text-primary)'
-  },
-  orderBottom: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: '0.25rem'
-  },
-  timeTag: {
-    fontSize: '0.75rem',
-    color: 'var(--text-muted)'
-  },
-  quickHandoverBtn: {
-    backgroundColor: 'var(--accent-success)',
-    color: '#fff',
-    padding: '4px 12px',
-    borderRadius: '6px',
-    fontSize: '0.8rem',
-    fontWeight: '600'
-  },
-  prepStatusPill: {
-    fontSize: '0.75rem',
-    color: '#f59e0b',
-    fontWeight: '600',
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    padding: '2px 8px',
-    borderRadius: '4px'
-  }
-};

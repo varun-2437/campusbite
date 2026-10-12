@@ -963,7 +963,10 @@ export const initialStaffAccounts = [
 export const initialFeedback = [
   { id: 'fb-1', studentName: 'Priya N.', orderId: 'ORD-092', rating: 5, comment: 'Ghee Podi Idly was piping hot and delicious!', date: 'Today, 1:15 PM' },
   { id: 'fb-2', studentName: 'Aditya P.', orderId: 'ORD-089', rating: 5, comment: 'Chilly Gobi was crisp and freshly made.', date: 'Today, 12:40 PM' },
-  { id: 'fb-3', studentName: 'Harish K.', orderId: 'ORD-081', rating: 5, comment: 'South Indian coffee was strong and aromatic.', date: 'Yesterday' }
+  { id: 'fb-3', studentName: 'Harish K.', orderId: 'ORD-081', rating: 4, comment: 'South Indian coffee was strong and aromatic. Quick pickup service.', date: 'Today, 11:10 AM' },
+  { id: 'fb-4', studentName: 'Ananya S.', orderId: 'ORD-077', rating: 4, comment: 'Paneer Butter Masala had great flavor, very satisfying lunch meal.', date: 'Yesterday, 2:30 PM' },
+  { id: 'fb-5', studentName: 'Karthik V.', orderId: 'ORD-065', rating: 3, comment: 'Food was decent but had to wait about 8 minutes past pickup time.', date: 'Yesterday, 1:05 PM' },
+  { id: 'fb-6', studentName: 'Sneha M.', orderId: 'ORD-052', rating: 5, comment: 'Cold badam milk was super refreshing between exam hours!', date: '2 days ago' }
 ];
 
 export const initialSalesData = [

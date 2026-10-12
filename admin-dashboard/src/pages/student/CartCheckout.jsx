@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
+import { useAuth } from '../../context/AuthContext';
 import RazorpaySimulatorModal from '../../components/student/RazorpaySimulatorModal';
 import { PageHeader, EmptyState } from '../../theme/ui';
 import {
@@ -32,7 +33,10 @@ export default function CartCheckout() {
     placeStudentOrder,
     studentUser
   } = useStore();
+  const { user, isGuest } = useAuth();
   const navigate = useNavigate();
+
+  const isStudent = !isGuest && user?.role === 'student';
 
   const [paymentMethod, setPaymentMethod] = useState('Online'); // 'Online' or 'Cash'
   const [specialInstructions, setSpecialInstructions] = useState('');
@@ -418,9 +422,15 @@ export default function CartCheckout() {
               <div className="pt-2 border-t border-line flex items-baseline justify-between">
                 <div>
                   <div className="text-[14px] font-semibold text-fg">Total Payable</div>
-                  <div className="text-[11px] text-fg-muted">
-                    +{Math.floor(cartTotal / 10)} loyalty points on completion
-                  </div>
+                  {isStudent ? (
+                    <div className="text-[11px] text-fg-muted">
+                      +{Math.floor(cartTotal / 10)} loyalty points on completion
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-fg-muted">
+                      Standard canteen checkout
+                    </div>
+                  )}
                 </div>
                 <div className="text-[20px] font-semibold text-fg tabular-nums">
                   ₹{cartTotal}

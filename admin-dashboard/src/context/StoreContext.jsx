@@ -9,10 +9,13 @@ import {
 } from '../services/mockData';
 import { socketService } from '../services/socket';
 import { api } from '../services/api';
+import { useAuth } from './AuthContext';
 
 const StoreContext = createContext(null);
 
 export const StoreProvider = ({ children }) => {
+  const { user, isGuest, updateLoyaltyPoints } = useAuth();
+
   // Orders
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('cb_orders');
@@ -58,18 +61,59 @@ export const StoreProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // Student profile
+  // Student profile (synced with AuthContext)
   const [studentUser, setStudentUser] = useState(() => {
-    const saved = localStorage.getItem('cb_student_user');
-    return saved ? JSON.parse(saved) : {
-      id: 'std_krithik_24',
-      name: 'Krithik (Student)',
-      email: 'krithik.student@campusbite.com',
-      rollNo: '21CS104',
-      isGuest: false,
-      loyaltyPoints: 120
+    if (!user || user.role === 'guest') {
+      return {
+        id: 'guest_diner',
+        name: 'Guest Diner',
+        email: '',
+        rollNo: 'GUEST',
+        isGuest: true,
+        loyaltyPoints: 0
+      };
+    }
+    return {
+      id: user.id || 'std_krithik_24',
+      name: user.name || 'Student Diner',
+      email: user.email || '',
+      rollNo: user.studentId || '21CS104',
+      isGuest: user.role !== 'student',
+      loyaltyPoints: user.role === 'student' ? (user.loyaltyPoints || 0) : 0
     };
   });
+
+  // Keep studentUser synced whenever AuthContext user changes
+  useEffect(() => {
+    if (isGuest || !user) {
+      setStudentUser({
+        id: 'guest_diner',
+        name: 'Guest Diner',
+        email: '',
+        rollNo: 'GUEST',
+        isGuest: true,
+        loyaltyPoints: 0
+      });
+    } else if (user.role === 'student') {
+      setStudentUser({
+        id: user.id || 'std_krithik_24',
+        name: user.name || 'Student Diner',
+        email: user.email || '',
+        rollNo: user.studentId || '21CS104',
+        isGuest: false,
+        loyaltyPoints: typeof user.loyaltyPoints === 'number' ? user.loyaltyPoints : 240
+      });
+    } else {
+      setStudentUser({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        rollNo: user.role?.toUpperCase() || 'STAFF',
+        isGuest: true,
+        loyaltyPoints: 0
+      });
+    }
+  }, [user, isGuest]);
 
   // Active student order for tracking
   const [activeStudentOrderId, setActiveStudentOrderId] = useState(() => {
@@ -349,13 +393,15 @@ export const StoreProvider = ({ children }) => {
     setOrders((prev) => [newOrder, ...prev]);
     setActiveStudentOrderId(orderId);
 
-    // Award loyalty points to registered student (10 points per ₹100 spent)
-    if (!studentUser.isGuest) {
+    // Award loyalty points ONLY to logged-in students (10 points per ₹100 spent)
+    if (!isGuest && user?.role === 'student') {
       const pointsEarned = Math.max(5, Math.floor(cartTotal / 10));
+      const newPoints = (user.loyaltyPoints || studentUser.loyaltyPoints || 0) + pointsEarned;
       setStudentUser((prev) => ({
         ...prev,
-        loyaltyPoints: (prev.loyaltyPoints || 0) + pointsEarned
+        loyaltyPoints: newPoints
       }));
+      if (updateLoyaltyPoints) updateLoyaltyPoints(newPoints);
     }
 
     // Add push notification
@@ -380,7 +426,7 @@ export const StoreProvider = ({ children }) => {
   const submitFeedback = ({ orderId, rating, comment, tags = [], studentName = '' }) => {
     const newFeedback = {
       id: `fb-${Date.now().toString().slice(-4)}`,
-      studentName: studentName || studentUser.name || 'Anonymous Student',
+      studentName: studentName || (user?.name || studentUser.name || 'Anonymous Student'),
       orderId,
       rating,
       comment,
@@ -390,33 +436,44 @@ export const StoreProvider = ({ children }) => {
 
     setFeedbackList((prev) => [newFeedback, ...prev]);
 
-    // Give bonus 15 loyalty points for reviewing!
-    if (!studentUser.isGuest) {
+    // Give bonus 15 loyalty points ONLY to logged-in students
+    if (!isGuest && user?.role === 'student') {
+      const newPoints = (user.loyaltyPoints || studentUser.loyaltyPoints || 0) + 15;
       setStudentUser((prev) => ({
         ...prev,
-        loyaltyPoints: (prev.loyaltyPoints || 0) + 15
+        loyaltyPoints: newPoints
       }));
+      if (updateLoyaltyPoints) updateLoyaltyPoints(newPoints);
     }
 
     addStudentNotification({
       title: 'Feedback Recorded',
-      message: 'You received 15 bonus loyalty points for reviewing your meal.'
+      message: (!isGuest && user?.role === 'student')
+        ? 'You received 15 bonus loyalty points for reviewing your meal.'
+        : 'Thank you for submitting your meal feedback!'
     });
 
     api.submitFeedback(newFeedback).catch(() => {});
     return newFeedback;
   };
 
-  // Loyalty Rewards Redemption
+  // Loyalty Rewards Redemption (Strictly for logged-in students)
   const redeemReward = (reward) => {
-    if (studentUser.loyaltyPoints < reward.cost) {
+    if (isGuest || user?.role !== 'student') {
+      return { success: false, message: 'Loyalty rewards redemption is exclusive to logged-in students.' };
+    }
+
+    const currentPoints = user?.loyaltyPoints ?? studentUser.loyaltyPoints ?? 0;
+    if (currentPoints < reward.cost) {
       return { success: false, message: 'Insufficient loyalty points balance!' };
     }
 
+    const newPoints = currentPoints - reward.cost;
     setStudentUser((prev) => ({
       ...prev,
-      loyaltyPoints: prev.loyaltyPoints - reward.cost
+      loyaltyPoints: newPoints
     }));
+    if (updateLoyaltyPoints) updateLoyaltyPoints(newPoints);
 
     const rewardCoupon = {
       code: `REWARD-${reward.id.toUpperCase()}`,

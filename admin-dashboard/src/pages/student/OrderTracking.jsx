@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/StoreContext';
+import { useAuth } from '../../context/AuthContext';
 import FeedbackModal from '../../components/student/FeedbackModal';
 import QRCodeView from '../../components/common/QRCodeView';
 import { PageHeader, StatusBadge, EmptyState } from '../../theme/ui';
@@ -22,7 +23,10 @@ export default function OrderTracking() {
     activeStudentOrderId,
     setActiveStudentOrderId
   } = useStore();
+  const { user, isGuest } = useAuth();
   const navigate = useNavigate();
+
+  const isStudent = !isGuest && user?.role === 'student';
 
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
@@ -200,7 +204,9 @@ export default function OrderTracking() {
                     Order Handover Completed
                   </div>
                   <div className="text-[12px] text-fg-muted mt-0.5">
-                    Share your feedback to earn 15 bonus loyalty points.
+                    {isStudent
+                      ? 'Share your feedback to earn 15 bonus loyalty points.'
+                      : 'Share your feedback to help the canteen improve food & service.'}
                   </div>
                 </div>
                 <button

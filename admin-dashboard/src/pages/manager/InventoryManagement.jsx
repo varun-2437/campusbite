@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Package, AlertTriangle, Edit3, Save, Check } from 'lucide-react';
+import { Package, AlertTriangle, Edit3, Check, Search, ShieldCheck, AlertCircle, XCircle } from 'lucide-react';
 
 export default function InventoryManagement() {
   const { inventory, updateInventoryStock } = useStore();
   const [editingId, setEditingId] = useState(null);
   const [editQty, setEditQty] = useState('');
   const [editThreshold, setEditThreshold] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCat, setSelectedCat] = useState('ALL');
 
   const startEdit = (item) => {
     setEditingId(item.id);
@@ -19,106 +21,217 @@ export default function InventoryManagement() {
     setEditingId(null);
   };
 
+  // Metrics
+  const totalItems = inventory.length;
+  const lowCount = inventory.filter((i) => i.quantity > 0 && i.quantity <= i.threshold).length;
+  const outCount = inventory.filter((i) => i.quantity === 0).length;
+  const adequateCount = totalItems - lowCount - outCount;
+
+  // Categories
+  const categories = ['ALL', ...new Set(inventory.map((i) => i.category))];
+
+  // Filtered Items
+  const filteredItems = inventory.filter((item) => {
+    const matchesSearch = item.itemName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCat = selectedCat === 'ALL' || item.category === selectedCat;
+    return matchesSearch && matchesCat;
+  });
+
   return (
-    <div>
-      <div style={styles.header}>
-        <div>
-          <h1 style={styles.pageTitle}>Inventory & Stock Control</h1>
-          <p style={styles.pageSubtitle}>
-            Monitor raw kitchen supplies, set minimum thresholds, and prevent stock-outs
-          </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-fg">Inventory & Stock Control</h1>
+        <p className="text-sm text-fg-muted">
+          Monitor raw kitchen supplies, set minimum thresholds, and prevent stock-outs
+        </p>
+      </div>
+
+      {/* Metric Cards Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="card bg-surface border border-line rounded-xl p-4 shadow-sm flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400">
+            <Package size={20} />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-fg-muted">Total Supplies</div>
+            <div className="text-xl font-bold text-fg">{totalItems} Items</div>
+          </div>
+        </div>
+
+        <div className="card bg-surface border border-line rounded-xl p-4 shadow-sm flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+            <ShieldCheck size={20} />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-fg-muted">Optimal Stock</div>
+            <div className="text-xl font-bold text-emerald-600">{adequateCount} Items</div>
+          </div>
+        </div>
+
+        <div className="card bg-surface border border-line rounded-xl p-4 shadow-sm flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+            <AlertCircle size={20} />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-fg-muted">Low Stock Alert</div>
+            <div className="text-xl font-bold text-amber-600">{lowCount} Items</div>
+          </div>
+        </div>
+
+        <div className="card bg-surface border border-line rounded-xl p-4 shadow-sm flex items-center gap-3">
+          <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400">
+            <XCircle size={20} />
+          </div>
+          <div>
+            <div className="text-xs font-medium text-fg-muted">Out of Stock</div>
+            <div className="text-xl font-bold text-red-600">{outCount} Items</div>
+          </div>
         </div>
       </div>
 
-      <div style={styles.tableCard}>
-        <div style={styles.tableWrapper}>
-          <table style={styles.table}>
+      {/* Filter and Search Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-surface border border-line rounded-xl p-3 shadow-sm">
+        <div className="relative flex-1 min-w-[240px] max-w-md">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted pointer-events-none" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search ingredient or item name..."
+            className="w-full h-9 pl-9 pr-3 text-xs bg-surface border border-line-strong rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-fg placeholder:text-fg-subtle"
+          />
+        </div>
+
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCat(cat)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer ${
+                selectedCat === cat
+                  ? 'bg-accent text-white font-semibold shadow-sm'
+                  : 'text-fg-muted hover:text-fg hover:bg-surface-2'
+              }`}
+            >
+              {cat === 'ALL' ? 'All Categories' : cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Professional Data Table */}
+      <div className="card p-0 overflow-hidden border border-line rounded-xl shadow-sm bg-surface">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr>
-                <th>Item Name</th>
-                <th>Category</th>
-                <th>Current Stock</th>
-                <th>Unit</th>
-                <th>Min Threshold</th>
-                <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+              <tr className="bg-surface-2 border-b border-line text-xs font-semibold text-fg-muted uppercase tracking-wider">
+                <th className="px-5 py-3.5">Item Name</th>
+                <th className="px-4 py-3.5">Category</th>
+                <th className="px-4 py-3.5">Current Stock</th>
+                <th className="px-4 py-3.5">Unit</th>
+                <th className="px-4 py-3.5">Min Threshold</th>
+                <th className="px-4 py-3.5">Status</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {inventory.map((item) => {
-                const isLow = item.quantity <= item.threshold;
-                const isOut = item.quantity === 0;
-                const isEditing = editingId === item.id;
+            <tbody className="divide-y divide-line">
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-xs text-fg-muted">
+                    No inventory items match the current search or category filter.
+                  </td>
+                </tr>
+              ) : (
+                filteredItems.map((item) => {
+                  const isLow = item.quantity > 0 && item.quantity <= item.threshold;
+                  const isOut = item.quantity === 0;
+                  const isEditing = editingId === item.id;
 
-                return (
-                  <tr key={item.id}>
-                    <td>
-                      <strong>{item.itemName}</strong>
-                    </td>
-                    <td>
-                      <span style={styles.catBadge}>{item.category}</span>
-                    </td>
-                    <td>
-                      {isEditing ? (
-                        <input
-                          type="number"
-                          value={editQty}
-                          onChange={(e) => setEditQty(e.target.value)}
-                          style={styles.editInput}
-                        />
-                      ) : (
-                        <span style={{ fontSize: '1rem', fontWeight: '700' }}>
-                          {item.quantity}
+                  return (
+                    <tr
+                      key={item.id}
+                      className="hover:bg-surface-2/60 transition group"
+                    >
+                      <td className="px-5 py-3.5">
+                        <div className="font-semibold text-fg text-sm">{item.itemName}</div>
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-2 border border-line text-fg-muted">
+                          {item.category}
                         </span>
-                      )}
-                    </td>
-                    <td>{item.unit}</td>
-                    <td>
-                      {isEditing ? (
-                        <input
-                          type="number"
-                          value={editThreshold}
-                          onChange={(e) => setEditThreshold(e.target.value)}
-                          style={styles.editInput}
-                        />
-                      ) : (
-                        <span>{item.threshold}</span>
-                      )}
-                    </td>
-                    <td>
-                      <span
-                        style={{
-                          padding: '3px 10px',
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
-                          fontWeight: '700',
-                          backgroundColor: isOut
-                            ? 'rgba(239, 68, 68, 0.2)'
-                            : isLow
-                            ? 'rgba(245, 158, 11, 0.2)'
-                            : 'rgba(16, 185, 129, 0.2)',
-                          color: isOut ? '#ef4444' : isLow ? '#f59e0b' : '#10b981'
-                        }}
-                      >
-                        {isOut ? 'OUT OF STOCK' : isLow ? 'LOW STOCK' : 'ADEQUATE'}
-                      </span>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      {isEditing ? (
-                        <button onClick={() => handleSave(item.id)} style={styles.saveBtn}>
-                          <Check size={16} />
-                          <span>Save</span>
-                        </button>
-                      ) : (
-                        <button onClick={() => startEdit(item)} style={styles.editBtn}>
-                          <Edit3 size={15} />
-                          <span>Update</span>
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            value={editQty}
+                            onChange={(e) => setEditQty(e.target.value)}
+                            className="w-20 h-8 px-2 text-sm font-semibold border border-line-strong rounded focus:outline-none focus:ring-1 focus:ring-accent bg-surface text-fg"
+                          />
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-fg text-base">{item.quantity}</span>
+                            <span className="text-xs text-fg-muted">{item.unit}</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5 text-xs text-fg-muted">
+                        {item.unit}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            value={editThreshold}
+                            onChange={(e) => setEditThreshold(e.target.value)}
+                            className="w-20 h-8 px-2 text-sm font-semibold border border-line-strong rounded focus:outline-none focus:ring-1 focus:ring-accent bg-surface text-fg"
+                          />
+                        ) : (
+                          <span className="text-xs font-mono font-medium text-fg-muted">
+                            {item.threshold} {item.unit}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        {isOut ? (
+                          <span className="badge-danger text-xs font-semibold">
+                            OUT OF STOCK
+                          </span>
+                        ) : isLow ? (
+                          <span className="badge-warning text-xs font-semibold">
+                            LOW STOCK
+                          </span>
+                        ) : (
+                          <span className="badge-success text-xs font-semibold">
+                            ADEQUATE
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        {isEditing ? (
+                          <button
+                            onClick={() => handleSave(item.id)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs shadow-sm transition cursor-pointer"
+                          >
+                            <Check size={14} />
+                            <span>Save</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => startEdit(item)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-line bg-surface hover:bg-surface-2 text-fg text-xs font-medium transition cursor-pointer shadow-sm"
+                          >
+                            <Edit3 size={13} className="text-fg-muted" />
+                            <span>Update</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -126,70 +239,3 @@ export default function InventoryManagement() {
     </div>
   );
 }
-
-const styles = {
-  header: {
-    marginBottom: '1.5rem'
-  },
-  pageTitle: {
-    fontSize: '1.6rem',
-    fontWeight: '700',
-    color: 'var(--text-primary)'
-  },
-  pageSubtitle: {
-    fontSize: '0.85rem',
-    color: 'var(--text-secondary)'
-  },
-  tableCard: {
-    backgroundColor: 'var(--bg-secondary)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '16px',
-    overflow: 'hidden'
-  },
-  tableWrapper: {
-    overflowX: 'auto'
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    textAlign: 'left',
-    fontSize: '0.85rem'
-  },
-  catBadge: {
-    backgroundColor: 'var(--bg-hover)',
-    padding: '2px 8px',
-    borderRadius: '4px',
-    fontSize: '0.75rem'
-  },
-  editInput: {
-    width: '70px',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    backgroundColor: 'var(--bg-primary)',
-    border: '1px solid var(--border-color)',
-    color: 'var(--text-primary)',
-    fontSize: '0.85rem'
-  },
-  editBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    backgroundColor: 'var(--bg-hover)',
-    color: 'var(--text-primary)',
-    padding: '4px 10px',
-    borderRadius: '6px',
-    fontSize: '0.8rem',
-    fontWeight: '500'
-  },
-  saveBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    backgroundColor: 'var(--accent-success)',
-    color: '#fff',
-    padding: '4px 10px',
-    borderRadius: '6px',
-    fontSize: '0.8rem',
-    fontWeight: '600'
-  }
-};

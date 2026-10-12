@@ -353,6 +353,31 @@ export const AuthProvider = ({ children }) => {
     } catch {}
   };
 
+  // Update loyalty points for active logged-in student
+  const updateLoyaltyPoints = (newPoints) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, loyaltyPoints: newPoints };
+      try {
+        localStorage.setItem('cb_staff_user', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
+    setRegisteredUsers((prev) => {
+      const updated = prev.map((u) => {
+        if (user && (u.id === user.id || u.email === user.email)) {
+          return { ...u, loyaltyPoints: newPoints };
+        }
+        return u;
+      });
+      try {
+        localStorage.setItem('cb_registered_users', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('cb_staff_user');
@@ -373,6 +398,7 @@ export const AuthProvider = ({ children }) => {
         approveStaffAccount,
         rejectStaffAccount,
         toggleStaffStatus,
+        updateLoyaltyPoints,
         isAuthModalOpen,
         openAuthModal,
         closeAuthModal
